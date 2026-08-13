@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Raise First</title>
 
@@ -11,28 +14,137 @@
 
 <body>
 
-    <!-- =========================
-         HOME PAGE
-    ========================== -->
+    <!-- =====================================================
+         PAGE 1 — LOGIN
+    ====================================================== -->
 
-    <main id="homePage" class="page">
+    <main id="loginPage" class="page">
 
         <div class="container">
 
             <h1>🙋 Raise First</h1>
 
             <p class="tagline">
-                Who raised their hand first?
+                Raise your hand first.
             </p>
 
-            <div class="home-buttons">
+            <h2>Login</h2>
 
-                <button id="joinRoomBtn" class="primary-btn">
-                    🔑 Enter Code to Join
+            <input
+                type="text"
+                id="loginUsername"
+                placeholder="Username or Email"
+                autocomplete="username"
+            >
+
+            <input
+                type="password"
+                id="loginPassword"
+                placeholder="Password"
+                autocomplete="current-password"
+            >
+
+            <button
+                id="loginBtn"
+                class="primary-btn">
+                Login
+            </button>
+
+            <p id="loginError"
+               class="error-message"></p>
+
+            <p class="signup-text">
+                Don't have an account?
+            </p>
+
+            <button
+                id="signupBtn"
+                class="link-btn">
+                Sign Up
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         SIGN UP PAGE
+    ====================================================== -->
+
+    <main id="signupPage" class="page hidden">
+
+        <div class="container">
+
+            <button
+                class="back-btn"
+                onclick="showPage('loginPage')">
+                ← Back
+            </button>
+
+            <h2>Create Account</h2>
+
+            <input
+                type="text"
+                id="signupName"
+                placeholder="Enter your name"
+                maxlength="50"
+            >
+
+            <input
+                type="email"
+                id="signupEmail"
+                placeholder="Enter email"
+                autocomplete="email"
+            >
+
+            <input
+                type="password"
+                id="signupPassword"
+                placeholder="Create password"
+                autocomplete="new-password"
+            >
+
+            <button
+                id="createAccountBtn"
+                class="primary-btn">
+                Create Account
+            </button>
+
+            <p id="signupError"
+               class="error-message"></p>
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         PAGE 2 — MAIN MENU
+    ====================================================== -->
+
+    <main id="mainPage" class="page hidden">
+
+        <div class="container">
+
+            <h2>Welcome 👋</h2>
+
+            <p>
+                What do you want to do?
+            </p>
+
+            <div class="menu-buttons">
+
+                <button
+                    id="createRoomBtn"
+                    class="primary-btn">
+                    ➕ Create Room
                 </button>
 
-                <button id="createRoomBtn" class="secondary-btn">
-                    ➕ Create Room
+                <button
+                    id="joinRoomBtn"
+                    class="secondary-btn">
+                    🔑 Join Using Code
                 </button>
 
             </div>
@@ -42,159 +154,25 @@
     </main>
 
 
-    <!-- =========================
-         JOIN ROOM PAGE
-    ========================== -->
-
-    <main id="joinPage" class="page hidden">
-
-        <div class="container">
-
-            <button class="back-btn" onclick="showPage('homePage')">
-                ← Back
-            </button>
-
-            <h2>🔑 Join Room</h2>
-
-            <p>Enter the code provided by the host.</p>
-
-            <input
-                type="text"
-                id="roomCodeInput"
-                placeholder="Enter room code"
-                maxlength="20"
-                autocomplete="off"
-            >
-
-            <button id="continueJoinBtn" class="primary-btn">
-                Continue
-            </button>
-
-            <p id="joinError" class="error-message"></p>
-
-        </div>
-
-    </main>
-
-
-    <!-- =========================
-         JOIN ROLE PAGE
-    ========================== -->
-
-    <main id="joinRolePage" class="page hidden">
-
-        <div class="container">
-
-            <button class="back-btn" onclick="showPage('joinPage')">
-                ← Back
-            </button>
-
-            <h2>Join Room</h2>
-
-            <p>Choose how you are joining.</p>
-
-            <button id="teacherJoinBtn" class="role-btn">
-                👨‍🏫 Teacher
-            </button>
-
-            <button id="studentJoinBtn" class="role-btn">
-                👨‍🎓 Student
-            </button>
-
-        </div>
-
-    </main>
-
-
-    <!-- =========================
-         STUDENT DETAILS PAGE
-    ========================== -->
-
-    <main id="studentDetailsPage" class="page hidden">
-
-        <div class="container">
-
-            <button class="back-btn" onclick="showPage('joinRolePage')">
-                ← Back
-            </button>
-
-            <h2>👨‍🎓 Student Details</h2>
-
-            <input
-                type="text"
-                id="studentName"
-                placeholder="Enter your name"
-                maxlength="50"
-                autocomplete="name"
-            >
-
-            <input
-                type="text"
-                id="rollNumber"
-                placeholder="Enter roll number"
-                maxlength="30"
-                autocomplete="off"
-            >
-
-            <button id="joinAsStudentBtn" class="primary-btn">
-                Join Room
-            </button>
-
-            <p id="studentError" class="error-message"></p>
-
-        </div>
-
-    </main>
-
-
-    <!-- =========================
-         TEACHER DETAILS PAGE
-    ========================== -->
-
-    <main id="teacherDetailsPage" class="page hidden">
-
-        <div class="container">
-
-            <button class="back-btn" onclick="showPage('joinRolePage')">
-                ← Back
-            </button>
-
-            <h2>👨‍🏫 Teacher Details</h2>
-
-            <input
-                type="text"
-                id="teacherName"
-                placeholder="Enter your name"
-                maxlength="50"
-                autocomplete="name"
-            >
-
-            <button id="joinAsTeacherBtn" class="primary-btn">
-                Join Room
-            </button>
-
-            <p id="teacherError" class="error-message"></p>
-
-        </div>
-
-    </main>
-
-
-    <!-- =========================
-         CREATE ROOM PAGE
-    ========================== -->
+    <!-- =====================================================
+         CREATE ROOM — STEP 1
+    ====================================================== -->
 
     <main id="createRoomPage" class="page hidden">
 
         <div class="container">
 
-            <button class="back-btn" onclick="showPage('homePage')">
+            <button
+                class="back-btn"
+                onclick="showPage('mainPage')">
                 ← Back
             </button>
 
-            <h2>➕ Create Room</h2>
+            <h2>Create Room</h2>
 
-            <p>Give your room a name.</p>
+            <p>
+                Enter a name for your room.
+            </p>
 
             <input
                 type="text"
@@ -204,49 +182,76 @@
                 autocomplete="off"
             >
 
-            <button id="continueCreateBtn" class="primary-btn">
+            <button
+                id="continueCreateBtn"
+                class="primary-btn">
                 Continue
             </button>
 
-            <p id="createError" class="error-message"></p>
+            <p id="createError"
+               class="error-message"></p>
 
         </div>
 
     </main>
 
 
-    <!-- =========================
-         QUESTION MODE PAGE
-    ========================== -->
+    <!-- =====================================================
+         CREATE ROOM — STEP 2
+         QUESTION MODE
+    ====================================================== -->
 
-    <main id="questionModePage" class="page hidden">
+    <main id="questionModePage"
+          class="page hidden">
 
         <div class="container">
 
-            <button class="back-btn" onclick="showPage('createRoomPage')">
+            <button
+                class="back-btn"
+                onclick="showPage('createRoomPage')">
                 ← Back
             </button>
 
-            <h2>📝 Question Mode</h2>
+            <h2>Question Mode</h2>
 
-            <p>How will you ask questions?</p>
+            <p>
+                How will you ask questions?
+            </p>
 
-            <button id="websiteQuestionBtn" class="mode-btn">
+            <button
+                id="websiteQuestionBtn"
+                class="mode-btn">
 
-                📝
+                <span class="mode-icon">📝</span>
+
                 <span>
-                    Ask Questions
-                    <small>on Website</small>
+                    <strong>
+                        Ask Questions in Website
+                    </strong>
+
+                    <small>
+                        Questions appear on
+                        members' screens.
+                    </small>
                 </span>
 
             </button>
 
-            <button id="manualQuestionBtn" class="mode-btn">
 
-                🗣️
+            <button
+                id="manualQuestionBtn"
+                class="mode-btn">
+
+                <span class="mode-icon">🗣️</span>
+
                 <span>
-                    Ask Questions
-                    <small>Manually</small>
+                    <strong>
+                        Ask Questions Manually
+                    </strong>
+
+                    <small>
+                        Ask questions verbally.
+                    </small>
                 </span>
 
             </button>
@@ -256,56 +261,94 @@
     </main>
 
 
-    <!-- =========================
+    <!-- =====================================================
          ROOM CREATED PAGE
-    ========================== -->
+    ====================================================== -->
 
-    <main id="roomCreatedPage" class="page hidden">
+    <main id="roomCreatedPage"
+          class="page hidden">
 
         <div class="container">
 
-            <h2>🎉 Room Created!</h2>
+            <h2>🎉 Room Created</h2>
 
-            <div class="room-info">
+            <p class="room-created-text">
+                Share the appropriate code
+                with other members.
+            </p>
 
-                <p class="label">Room Name</p>
-                <h3 id="createdRoomName">Room</h3>
 
-                <div class="code-card host-card">
-                    <p>👑 Host Code</p>
-                    <strong id="hostCode">--------</strong>
-                    <button onclick="copyCode('hostCode')">
-                        Copy
-                    </button>
-                </div>
+            <div class="created-room-name">
 
-                <div class="code-card teacher-card">
-                    <p>👨‍🏫 Teacher Code</p>
-                    <strong id="teacherCode">--------</strong>
-                    <button onclick="copyCode('teacherCode')">
-                        Copy
-                    </button>
-                </div>
+                <span>Room Name</span>
 
-                <div class="code-card student-card">
-                    <p>👨‍🎓 Student Code</p>
-                    <strong id="studentCode">--------</strong>
-                    <button onclick="copyCode('studentCode')">
-                        Copy
-                    </button>
-                </div>
+                <strong id="createdRoomName">
+                    Room
+                </strong>
 
             </div>
 
-            <div class="capacity">
 
-                <p>👑 Host + Teachers: <strong>0 / 50</strong></p>
+            <!-- TEACHER CODE -->
 
-                <p>👨‍🎓 Students: <strong>0 / 300</strong></p>
+            <div class="code-card">
+
+                <p>
+                    👨‍🏫 Teacher Code
+                </p>
+
+                <strong id="teacherCode">
+                    --------
+                </strong>
+
+                <button
+                    onclick="copyCode('teacherCode')"
+                    class="copy-btn">
+                    Copy
+                </button>
 
             </div>
 
-            <button id="enterHostRoomBtn" class="primary-btn">
+
+            <!-- STUDENT CODE -->
+
+            <div class="code-card">
+
+                <p>
+                    👨‍🎓 Student Code
+                </p>
+
+                <strong id="studentCode">
+                    --------
+                </strong>
+
+                <button
+                    onclick="copyCode('studentCode')"
+                    class="copy-btn">
+                    Copy
+                </button>
+
+            </div>
+
+
+            <div class="room-limit-info">
+
+                <p>
+                    👨‍🏫 Host + Teachers:
+                    <strong>0 / 50</strong>
+                </p>
+
+                <p>
+                    👨‍🎓 Students:
+                    <strong>0 / 300</strong>
+                </p>
+
+            </div>
+
+
+            <button
+                id="enterHostRoomBtn"
+                class="primary-btn">
                 Enter Room
             </button>
 
@@ -314,134 +357,114 @@
     </main>
 
 
-    <!-- =========================
-         STUDENT ROOM PAGE
-    ========================== -->
+    <!-- =====================================================
+         JOIN ROOM PAGE
+    ====================================================== -->
 
-    <main id="studentRoomPage" class="page hidden">
+    <main id="joinPage"
+          class="page hidden">
 
         <div class="container">
 
-            <p class="room-title">
-                Room: <span id="studentRoomName">Room</span>
-            </p>
-
-            <h2 id="studentWelcome">
-                Welcome 👋
-            </h2>
-
-            <div id="questionDisplay" class="question-box hidden">
-
-                <p>Question</p>
-
-                <h3 id="currentQuestion">
-                    Waiting for question...
-                </h3>
-
-            </div>
-
-            <button id="raiseHandBtn" class="raise-hand-btn">
-
-                🙋
-
-                <span>RAISE HAND</span>
-
+            <button
+                class="back-btn"
+                onclick="showPage('mainPage')">
+                ← Back
             </button>
 
-            <p id="handStatus">
-                Waiting for the next question...
+            <h2>🔑 Join Room</h2>
+
+            <p>
+                Enter the code given by
+                the Host.
             </p>
 
-        </div>
+            <input
+                type="text"
+                id="roomCodeInput"
+                placeholder="Enter room code"
+                maxlength="20"
+                autocomplete="off"
+            >
 
-    </main>
-
-
-    <!-- =========================
-         TEACHER ROOM PAGE
-    ========================== -->
-
-    <main id="teacherRoomPage" class="page hidden">
-
-        <div class="container">
-
-            <p class="room-title">
-                👨‍🏫 <span id="teacherRoomName">Room</span>
-            </p>
-
-            <h2>Students' Hands</h2>
-
-            <div id="handList" class="hand-list">
-
-                <p class="empty-message">
-                    No hands raised yet.
-                </p>
-
-            </div>
-
-            <button id="resetHandsBtn" class="danger-btn">
-                🔄 Reset Hands
+            <button
+                id="continueJoinBtn"
+                class="primary-btn">
+                Join
             </button>
 
+            <p id="joinError"
+               class="error-message"></p>
+
         </div>
 
     </main>
 
 
-    <!-- =========================
-         HOST ROOM PAGE
-    ========================== -->
+    <!-- =====================================================
+         STUDENT DETAILS
+    ====================================================== -->
 
-    <main id="hostRoomPage" class="page hidden">
+    <main id="studentDetailsPage"
+          class="page hidden">
 
         <div class="container">
 
-            <p class="room-title">
-                👑 <span id="hostRoomName">Room</span>
+            <h2>👨‍🎓 Student Details</h2>
+
+            <p>
+                Enter your details to join.
             </p>
 
-            <h2>Host Dashboard</h2>
+            <input
+                type="text"
+                id="studentName"
+                placeholder="Your name"
+                maxlength="50"
+            >
 
-            <div class="stats">
+            <input
+                type="text"
+                id="rollNumber"
+                placeholder="Roll number"
+                maxlength="30"
+            >
 
-                <div class="stat-card">
-                    <strong id="hostTeacherCount">0 / 50</strong>
-                    <span>Host + Teachers</span>
-                </div>
+            <button
+                id="joinAsStudentBtn"
+                class="primary-btn">
+                Join Room
+            </button>
 
-                <div class="stat-card">
-                    <strong id="hostStudentCount">0 / 300</strong>
-                    <span>Students</span>
-                </div>
-
-            </div>
-
-            <div class="host-controls">
-
-                <button id="hostResetBtn" class="danger-btn">
-                    🔄 Reset Hands
-                </button>
-
-                <button id="viewMembersBtn" class="secondary-btn">
-                    👥 View Members
-                </button>
-
-                <button id="endRoomBtn" class="danger-btn">
-                    🚪 End Room
-                </button>
-
-            </div>
+            <p id="studentError"
+               class="error-message"></p>
 
         </div>
 
     </main>
 
 
-    <!-- =========================
-         JAVASCRIPT
-    ========================== -->
+    <!-- =====================================================
+         TEACHER DETAILS
+    ====================================================== -->
 
-    <script src="script.js"></script>
+    <main id="teacherDetailsPage"
+          class="page hidden">
 
-</body>
-</html>
+        <div class="container">
+
+            <h2>👨‍🏫 Teacher Details</h2>
+
+            <p>
+                Enter your name to join.
+            </p>
+
+            <input
+                type="text"
+                id="teacherName"
+                placeholder="Your name"
+                maxlength="50"
+            >
+
+            <button
+                id="joinAsTeacherBtn"
