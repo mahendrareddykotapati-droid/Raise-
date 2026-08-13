@@ -1,6 +1,6 @@
 /* =========================================================
    RAISE FIRST
-   Main Stylesheet
+   FINAL STYLE SHEET
    ========================================================= */
 
 
@@ -23,7 +23,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     min-height: 100vh;
     background: #f4f7fb;
-    color: #1f2937;
+    color: #172033;
 }
 
 
@@ -33,9 +33,12 @@ body {
 
 .page {
     min-height: 100vh;
+    width: 100%;
+
     display: flex;
     justify-content: center;
     align-items: center;
+
     padding: 20px;
 }
 
@@ -50,16 +53,22 @@ body {
 
 
 /* =========================================================
-   MAIN CONTAINER
+   MAIN CARD
    ========================================================= */
 
 .container {
     width: 100%;
     max-width: 450px;
-    background: white;
-    padding: 30px 24px;
+
+    background: #ffffff;
+
+    padding: 32px 25px;
+
     border-radius: 24px;
-    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, 0.08);
+
     text-align: center;
 }
 
@@ -71,53 +80,103 @@ body {
 h1 {
     font-size: 38px;
     margin-bottom: 10px;
+    font-weight: 800;
 }
+
 
 h2 {
-    font-size: 28px;
+    font-size: 27px;
     margin-bottom: 12px;
+    font-weight: 750;
 }
 
+
 h3 {
-    font-size: 21px;
+    font-size: 20px;
+    line-height: 1.4;
 }
+
 
 p {
     line-height: 1.5;
 }
 
+
 .tagline {
     color: #6b7280;
-    margin-bottom: 35px;
+    margin-bottom: 32px;
 }
 
 
 /* =========================================================
-   BUTTON GROUP
+   INPUTS
    ========================================================= */
 
-.home-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+input,
+textarea {
+    width: 100%;
+
+    border: 2px solid #e5e7eb;
+
+    border-radius: 13px;
+
+    padding: 15px;
+
+    margin-top: 12px;
+
+    outline: none;
+
+    font-family: inherit;
+
+    font-size: 16px;
+
+    background: #f9fafb;
+
+    color: #172033;
+}
+
+
+input {
+    height: 52px;
+}
+
+
+textarea {
+    min-height: 120px;
+
+    resize: vertical;
+}
+
+
+input:focus,
+textarea:focus {
+    border-color: #2563eb;
+    background: #ffffff;
 }
 
 
 /* =========================================================
-   GENERAL BUTTONS
+   GENERAL BUTTON
    ========================================================= */
 
 button {
     border: none;
+
     cursor: pointer;
+
     font-family: inherit;
-    transition: transform 0.15s ease,
-                opacity 0.15s ease;
+
+    transition:
+        transform 0.15s ease,
+        opacity 0.15s ease,
+        box-shadow 0.15s ease;
 }
+
 
 button:active {
     transform: scale(0.97);
 }
+
 
 button:disabled {
     opacity: 0.5;
@@ -131,12 +190,28 @@ button:disabled {
 
 .primary-btn {
     width: 100%;
-    padding: 15px 20px;
-    border-radius: 12px;
+
+    min-height: 52px;
+
+    margin-top: 15px;
+
+    padding: 14px 20px;
+
+    border-radius: 13px;
+
     background: #2563eb;
-    color: white;
+
+    color: #ffffff;
+
     font-size: 17px;
-    font-weight: bold;
+
+    font-weight: 700;
+}
+
+
+.primary-btn:hover {
+    box-shadow:
+        0 6px 18px rgba(37, 99, 235, 0.22);
 }
 
 
@@ -146,12 +221,53 @@ button:disabled {
 
 .secondary-btn {
     width: 100%;
-    padding: 15px 20px;
-    border-radius: 12px;
-    background: #e5e7eb;
-    color: #111827;
+
+    min-height: 52px;
+
+    margin-top: 15px;
+
+    padding: 14px 20px;
+
+    border-radius: 13px;
+
+    background: #e9edf3;
+
+    color: #172033;
+
     font-size: 17px;
-    font-weight: bold;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   LINK BUTTON
+   ========================================================= */
+
+.link-btn {
+    background: transparent;
+
+    color: #2563eb;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    margin-top: 5px;
+}
+
+
+.link-btn:hover {
+    text-decoration: underline;
+}
+
+
+.signup-text {
+    margin-top: 22px;
+
+    color: #6b7280;
+
+    font-size: 14px;
 }
 
 
@@ -161,80 +277,109 @@ button:disabled {
 
 .back-btn {
     display: block;
+
     background: transparent;
+
     color: #2563eb;
+
     font-size: 15px;
+
+    font-weight: 700;
+
     margin-bottom: 25px;
 }
 
 
 /* =========================================================
-   INPUTS
+   MENU BUTTONS
    ========================================================= */
 
-input {
-    width: 100%;
-    padding: 15px;
-    margin: 12px 0;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    outline: none;
-    font-size: 16px;
-    background: #f9fafb;
-}
+.menu-buttons {
+    display: flex;
 
+    flex-direction: column;
 
-input:focus {
-    border-color: #2563eb;
-    background: white;
+    gap: 2px;
+
+    margin-top: 25px;
 }
 
 
 /* =========================================================
-   ROLE BUTTONS
-   ========================================================= */
-
-.role-btn {
-    width: 100%;
-    padding: 18px;
-    margin-top: 12px;
-    border-radius: 14px;
-    background: #f3f4f6;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   QUESTION MODE BUTTONS
+   QUESTION MODE BUTTON
    ========================================================= */
 
 .mode-btn {
     width: 100%;
+
     display: flex;
+
     align-items: center;
-    gap: 15px;
-    padding: 18px;
-    margin-top: 14px;
-    border-radius: 15px;
-    background: #f3f4f6;
+
     text-align: left;
-    font-size: 18px;
-    font-weight: bold;
+
+    gap: 16px;
+
+    padding: 18px;
+
+    margin-top: 15px;
+
+    border-radius: 16px;
+
+    background: #f4f6f9;
+
+    color: #172033;
+
+    font-size: 17px;
 }
 
 
-.mode-btn span {
+.mode-btn:hover {
+    background: #eaf0f8;
+}
+
+
+.mode-icon {
+    width: 48px;
+
+    height: 48px;
+
+    flex-shrink: 0;
+
     display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    border-radius: 13px;
+
+    background: #ffffff;
+
+    font-size: 25px;
+}
+
+
+.mode-btn span:last-child {
+    display: flex;
+
     flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.mode-btn strong {
+    font-size: 16px;
 }
 
 
 .mode-btn small {
-    margin-top: 4px;
-    font-size: 13px;
-    font-weight: normal;
     color: #6b7280;
+
+    font-size: 13px;
+
+    line-height: 1.4;
 }
 
 
@@ -244,30 +389,50 @@ input:focus {
 
 .error-message {
     min-height: 22px;
-    margin-top: 10px;
+
+    margin-top: 9px;
+
     color: #dc2626;
+
     font-size: 14px;
 }
 
 
 /* =========================================================
-   ROOM INFORMATION
+   ROOM CREATED
    ========================================================= */
 
-.room-info {
-    margin-top: 20px;
-}
-
-
-.label {
+.room-created-text {
     color: #6b7280;
-    font-size: 14px;
+
+    margin-bottom: 20px;
 }
 
 
-.room-info h3 {
-    margin-top: 5px;
-    margin-bottom: 20px;
+.created-room-name {
+    padding: 17px;
+
+    margin-bottom: 15px;
+
+    border-radius: 14px;
+
+    background: #f4f6f9;
+}
+
+
+.created-room-name span {
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-bottom: 5px;
+}
+
+
+.created-room-name strong {
+    font-size: 20px;
 }
 
 
@@ -277,287 +442,156 @@ input:focus {
 
 .code-card {
     padding: 18px;
-    margin: 12px 0;
+
+    margin-top: 12px;
+
     border-radius: 15px;
-    background: #f8fafc;
+
+    background: #f7f9fc;
+
+    border: 1px solid #edf0f5;
 }
 
 
 .code-card p {
+    color: #6b7280;
+
     font-size: 14px;
-    margin-bottom: 7px;
+
+    margin-bottom: 8px;
 }
 
 
 .code-card strong {
     display: block;
+
     font-size: 23px;
+
     letter-spacing: 2px;
-    margin-bottom: 10px;
+
+    margin-bottom: 11px;
 }
 
 
-.code-card button {
-    padding: 8px 15px;
-    border-radius: 8px;
-    background: #e5e7eb;
-    font-weight: bold;
-}
+.copy-btn {
+    padding: 8px 16px;
 
+    border-radius: 9px;
 
-/* =========================================================
-   CAPACITY
-   ========================================================= */
+    background: #e5eaf1;
 
-.capacity {
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 12px;
-    background: #f9fafb;
-    text-align: left;
-}
+    color: #172033;
 
+    font-weight: 700;
 
-.capacity p {
-    margin: 5px 0;
-}
-
-
-/* =========================================================
-   ROOM TITLE
-   ========================================================= */
-
-.room-title {
-    color: #6b7280;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-
-/* =========================================================
-   RAISE HAND BUTTON
-   ========================================================= */
-
-.raise-hand-btn {
-    width: 230px;
-    height: 230px;
-    margin: 35px auto 25px;
-    border-radius: 50%;
-    background: #f59e0b;
-    color: white;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    font-size: 52px;
-    font-weight: bold;
-
-    box-shadow:
-        0 12px 25px rgba(0, 0, 0, 0.15);
-}
-
-
-.raise-hand-btn span {
-    font-size: 18px;
-    margin-top: 10px;
-}
-
-
-.raise-hand-btn:active {
-    transform: scale(0.94);
-}
-
-
-/* =========================================================
-   HAND STATUS
-   ========================================================= */
-
-#handStatus {
-    color: #6b7280;
-    font-size: 15px;
-}
-
-
-/* =========================================================
-   QUESTION BOX
-   ========================================================= */
-
-.question-box {
-    margin: 20px 0;
-    padding: 20px;
-    border-radius: 15px;
-    background: #f3f4f6;
-}
-
-
-.question-box p {
-    color: #6b7280;
-    font-size: 14px;
-    margin-bottom: 8px;
-}
-
-
-/* =========================================================
-   HAND LIST
-   ========================================================= */
-
-.hand-list {
-    margin-top: 20px;
-    text-align: left;
-}
-
-
-.hand-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    padding: 15px;
-    margin: 10px 0;
-
-    border-radius: 12px;
-    background: #f8fafc;
-}
-
-
-.hand-item div {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-
-.hand-item small {
-    color: #6b7280;
-}
-
-
-.empty-message {
-    text-align: center;
-    color: #9ca3af;
-    padding: 30px 10px;
-}
-
-
-/* =========================================================
-   DANGER BUTTON
-   ========================================================= */
-
-.danger-btn {
-    width: 100%;
-    padding: 14px;
-    margin-top: 15px;
-
-    border-radius: 12px;
-
-    background: #dc2626;
-    color: white;
-
-    font-size: 16px;
-    font-weight: bold;
-}
-
-
-/* =========================================================
-   HOST STATISTICS
-   ========================================================= */
-
-.stats {
-    display: flex;
-    gap: 12px;
-    margin: 25px 0;
-}
-
-
-.stat-card {
-    flex: 1;
-    padding: 18px 10px;
-    border-radius: 15px;
-    background: #f3f4f6;
-
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-
-.stat-card strong {
-    font-size: 20px;
-}
-
-
-.stat-card span {
-    color: #6b7280;
     font-size: 13px;
 }
 
 
 /* =========================================================
-   HOST CONTROLS
+   ROOM LIMIT INFORMATION
    ========================================================= */
 
-.host-controls {
-    margin-top: 20px;
+.room-limit-info {
+    text-align: left;
+
+    padding: 15px;
+
+    margin: 18px 0;
+
+    border-radius: 13px;
+
+    background: #f7f9fc;
+}
+
+
+.room-limit-info p {
+    margin: 5px 0;
+
+    color: #596273;
+
+    font-size: 14px;
+}
+
+
+.room-limit-info strong {
+    color: #172033;
 }
 
 
 /* =========================================================
-   RESPONSIVE DESIGN
+   ROOM CONTAINER
    ========================================================= */
 
-@media (max-width: 480px) {
+.room-container {
+    width: 100%;
 
-    .page {
-        padding: 12px;
-    }
+    min-height: 100vh;
 
-    .container {
-        padding: 25px 18px;
-        border-radius: 20px;
-    }
+    max-width: 700px;
 
-    h1 {
-        font-size: 32px;
-    }
+    margin: 0 auto;
 
-    h2 {
-        font-size: 25px;
-    }
-
-    .raise-hand-btn {
-        width: 200px;
-        height: 200px;
-    }
-
-    .raise-hand-btn span {
-        font-size: 16px;
-    }
-
-    .stats {
-        flex-direction: column;
-    }
+    padding: 20px;
 }
 
 
 /* =========================================================
-   SMALL PHONES
+   ROOM HEADER
    ========================================================= */
 
-@media (max-width: 350px) {
+.room-header,
+.host-header {
+    width: 100%;
 
-    .container {
-        padding: 22px 15px;
-    }
+    display: flex;
 
-    .raise-hand-btn {
-        width: 175px;
-        height: 175px;
-        font-size: 43px;
-    }
+    justify-content: space-between;
 
-    .raise-hand-btn span {
-        font-size: 14px;
-    }
+    align-items: center;
+
+    margin-bottom: 25px;
 }
+
+
+.room-label {
+    display: block;
+
+    color: #7b8494;
+
+    font-size: 13px;
+
+    margin-bottom: 3px;
+}
+
+
+.room-header h2,
+.host-header h2 {
+    margin: 0;
+
+    font-size: 23px;
+}
+
+
+/* =========================================================
+   MEMBER COUNT CIRCLE
+   ========================================================= */
+
+.member-count-circle {
+    width: 45px;
+
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    border: 2px solid #e
