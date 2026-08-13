@@ -1,0 +1,563 @@
+/* =========================================================
+   RAISE FIRST
+   Main Stylesheet
+   ========================================================= */
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
+
+.page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+
+/* =========================================================
+   HIDDEN
+   ========================================================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
+.container {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 30px 24px;
+    border-radius: 24px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+    text-align: center;
+}
+
+
+/* =========================================================
+   HEADINGS
+   ========================================================= */
+
+h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-size: 28px;
+    margin-bottom: 12px;
+}
+
+h3 {
+    font-size: 21px;
+}
+
+p {
+    line-height: 1.5;
+}
+
+.tagline {
+    color: #6b7280;
+    margin-bottom: 35px;
+}
+
+
+/* =========================================================
+   BUTTON GROUP
+   ========================================================= */
+
+.home-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+/* =========================================================
+   GENERAL BUTTONS
+   ========================================================= */
+
+button {
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s ease,
+                opacity 0.15s ease;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+   ========================================================= */
+
+.primary-btn {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: #2563eb;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+   ========================================================= */
+
+.secondary-btn {
+    width: 100%;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: #e5e7eb;
+    color: #111827;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   BACK BUTTON
+   ========================================================= */
+
+.back-btn {
+    display: block;
+    background: transparent;
+    color: #2563eb;
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+input {
+    width: 100%;
+    padding: 15px;
+    margin: 12px 0;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    outline: none;
+    font-size: 16px;
+    background: #f9fafb;
+}
+
+
+input:focus {
+    border-color: #2563eb;
+    background: white;
+}
+
+
+/* =========================================================
+   ROLE BUTTONS
+   ========================================================= */
+
+.role-btn {
+    width: 100%;
+    padding: 18px;
+    margin-top: 12px;
+    border-radius: 14px;
+    background: #f3f4f6;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   QUESTION MODE BUTTONS
+   ========================================================= */
+
+.mode-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 18px;
+    margin-top: 14px;
+    border-radius: 15px;
+    background: #f3f4f6;
+    text-align: left;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+
+.mode-btn span {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.mode-btn small {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: normal;
+    color: #6b7280;
+}
+
+
+/* =========================================================
+   ERROR MESSAGE
+   ========================================================= */
+
+.error-message {
+    min-height: 22px;
+    margin-top: 10px;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   ROOM INFORMATION
+   ========================================================= */
+
+.room-info {
+    margin-top: 20px;
+}
+
+
+.label {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+
+.room-info h3 {
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   CODE CARDS
+   ========================================================= */
+
+.code-card {
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 15px;
+    background: #f8fafc;
+}
+
+
+.code-card p {
+    font-size: 14px;
+    margin-bottom: 7px;
+}
+
+
+.code-card strong {
+    display: block;
+    font-size: 23px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+
+.code-card button {
+    padding: 8px 15px;
+    border-radius: 8px;
+    background: #e5e7eb;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   CAPACITY
+   ========================================================= */
+
+.capacity {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f9fafb;
+    text-align: left;
+}
+
+
+.capacity p {
+    margin: 5px 0;
+}
+
+
+/* =========================================================
+   ROOM TITLE
+   ========================================================= */
+
+.room-title {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+
+/* =========================================================
+   RAISE HAND BUTTON
+   ========================================================= */
+
+.raise-hand-btn {
+    width: 230px;
+    height: 230px;
+    margin: 35px auto 25px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 52px;
+    font-weight: bold;
+
+    box-shadow:
+        0 12px 25px rgba(0, 0, 0, 0.15);
+}
+
+
+.raise-hand-btn span {
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+
+.raise-hand-btn:active {
+    transform: scale(0.94);
+}
+
+
+/* =========================================================
+   HAND STATUS
+   ========================================================= */
+
+#handStatus {
+    color: #6b7280;
+    font-size: 15px;
+}
+
+
+/* =========================================================
+   QUESTION BOX
+   ========================================================= */
+
+.question-box {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 15px;
+    background: #f3f4f6;
+}
+
+
+.question-box p {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+
+/* =========================================================
+   HAND LIST
+   ========================================================= */
+
+.hand-list {
+    margin-top: 20px;
+    text-align: left;
+}
+
+
+.hand-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 15px;
+    margin: 10px 0;
+
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+
+.hand-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.hand-item small {
+    color: #6b7280;
+}
+
+
+.empty-message {
+    text-align: center;
+    color: #9ca3af;
+    padding: 30px 10px;
+}
+
+
+/* =========================================================
+   DANGER BUTTON
+   ========================================================= */
+
+.danger-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+
+    border-radius: 12px;
+
+    background: #dc2626;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   HOST STATISTICS
+   ========================================================= */
+
+.stats {
+    display: flex;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+
+.stat-card {
+    flex: 1;
+    padding: 18px 10px;
+    border-radius: 15px;
+    background: #f3f4f6;
+
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+
+.stat-card strong {
+    font-size: 20px;
+}
+
+
+.stat-card span {
+    color: #6b7280;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   HOST CONTROLS
+   ========================================================= */
+
+.host-controls {
+    margin-top: 20px;
+}
+
+
+/* =========================================================
+   RESPONSIVE DESIGN
+   ========================================================= */
+
+@media (max-width: 480px) {
+
+    .page {
+        padding: 12px;
+    }
+
+    .container {
+        padding: 25px 18px;
+        border-radius: 20px;
+    }
+
+    h1 {
+        font-size: 32px;
+    }
+
+    h2 {
+        font-size: 25px;
+    }
+
+    .raise-hand-btn {
+        width: 200px;
+        height: 200px;
+    }
+
+    .raise-hand-btn span {
+        font-size: 16px;
+    }
+
+    .stats {
+        flex-direction: column;
+    }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 350px) {
+
+    .container {
+        padding: 22px 15px;
+    }
+
+    .raise-hand-btn {
+        width: 175px;
+        height: 175px;
+        font-size: 43px;
+    }
+
+    .raise-hand-btn span {
+        font-size: 14px;
+    }
+}
