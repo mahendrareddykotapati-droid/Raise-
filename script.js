@@ -1,34 +1,23 @@
 /* =========================================================
    RAISE FIRST
-   Main JavaScript
+   FINAL SCRIPT.JS
    ========================================================= */
 
 
 /* =========================================================
-   GLOBAL DATA
+   GLOBAL VARIABLES
    ========================================================= */
 
-let currentRoom = {
-    name: "",
-    mode: "",
-    hostCode: "",
-    teacherCode: "",
-    studentCode: ""
-};
+let currentUser = null;
+let currentRole = null;
+let currentRoom = null;
+let currentQuestionMode = null;
 
-let currentUser = {
-    name: "",
-    rollNumber: "",
-    role: ""
-};
-
-let raisedHands = [];
-
-let joinedRoomCode = "";
+let currentRoomData = null;
 
 
 /* =========================================================
-   PAGE NAVIGATION
+   PAGE CONTROL
    ========================================================= */
 
 function showPage(pageId) {
@@ -48,132 +37,466 @@ function showPage(pageId) {
 
 
 /* =========================================================
-   HOME
+   STORAGE
    ========================================================= */
 
-document.getElementById("joinRoomBtn").addEventListener("click", () => {
+function saveData(key, value) {
 
-    clearMessages();
+    localStorage.setItem(
+        key,
+        JSON.stringify(value)
+    );
+}
 
-    document.getElementById("roomCodeInput").value = "";
 
-    showPage("joinPage");
-});
+function getData(key) {
+
+    const data = localStorage.getItem(key);
+
+    if (!data) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(data);
+    } catch {
+        return null;
+    }
+}
 
 
-document.getElementById("createRoomBtn").addEventListener("click", () => {
+/* =========================================================
+   GENERATE RANDOM CODE
+   ========================================================= */
 
-    clearMessages();
+function generateCode(length = 6) {
 
-    document.getElementById("roomName").value = "";
+    const characters =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-    showPage("createRoomPage");
-});
+    let code = "";
+
+    for (let i = 0; i < length; i++) {
+
+        const randomIndex =
+            Math.floor(
+                Math.random() * characters.length
+            );
+
+        code += characters[randomIndex];
+    }
+
+    return code;
+}
+
+
+/* =========================================================
+   GENERATE UNIQUE ROOM CODES
+   ========================================================= */
+
+function generateRoomCodes() {
+
+    let teacherCode = generateCode();
+    let studentCode = generateCode();
+
+    while (teacherCode === studentCode) {
+        studentCode = generateCode();
+    }
+
+    return {
+        teacherCode,
+        studentCode
+    };
+}
+
+
+/* =========================================================
+   LOGIN
+   ========================================================= */
+
+function login() {
+
+    const username =
+        document.getElementById("loginUsername")
+        .value
+        .trim();
+
+    const password =
+        document.getElementById("loginPassword")
+        .value;
+
+    const error =
+        document.getElementById("loginError");
+
+
+    error.textContent = "";
+
+
+    if (!username || !password) {
+
+        error.textContent =
+            "Please enter username and password.";
+
+        return;
+    }
+
+
+    const users =
+        getData("raiseFirstUsers") || [];
+
+
+    const user =
+        users.find(
+            u =>
+                (u.email === username ||
+                 u.name === username) &&
+                u.password === password
+        );
+
+
+    if (!user) {
+
+        error.textContent =
+            "Invalid username/email or password.";
+
+        return;
+    }
+
+
+    currentUser = user;
+
+    saveData(
+        "raiseFirstCurrentUser",
+        currentUser
+    );
+
+
+    showPage("mainPage");
+}
+
+
+/* =========================================================
+   SIGN UP
+   ========================================================= */
+
+function signUp() {
+
+    const name =
+        document.getElementById("signupName")
+        .value
+        .trim();
+
+    const email =
+        document.getElementById("signupEmail")
+        .value
+        .trim()
+        .toLowerCase();
+
+    const password =
+        document.getElementById("signupPassword")
+        .value;
+
+    const error =
+        document.getElementById("signupError");
+
+
+    error.textContent = "";
+
+
+    if (!name || !email || !password) {
+
+        error.textContent =
+            "Please fill all fields.";
+
+        return;
+    }
+
+
+    if (password.length < 6) {
+
+        error.textContent =
+            "Password must contain at least 6 characters.";
+
+        return;
+    }
+
+
+    const users =
+        getData("raiseFirstUsers") || [];
+
+
+    const existingUser =
+        users.find(
+            user => user.email === email
+        );
+
+
+    if (existingUser) {
+
+        error.textContent =
+            "An account with this email already exists.";
+
+        return;
+    }
+
+
+    const newUser = {
+
+        id:
+            Date.now().toString(),
+
+        name: name,
+
+        email: email,
+
+        password: password
+    };
+
+
+    users.push(newUser);
+
+
+    saveData(
+        "raiseFirstUsers",
+        users
+    );
+
+
+    currentUser = newUser;
+
+
+    saveData(
+        "raiseFirstCurrentUser",
+        currentUser
+    );
+
+
+    document.getElementById("signupName").value = "";
+    document.getElementById("signupEmail").value = "";
+    document.getElementById("signupPassword").value = "";
+
+
+    showPage("mainPage");
+}
+
+
+/* =========================================================
+   CREATE ROOM — STEP 1
+   ========================================================= */
+
+function continueCreateRoom() {
+
+    const roomName =
+        document.getElementById("roomName")
+        .value
+        .trim();
+
+    const error =
+        document.getElementById("createError");
+
+
+    error.textContent = "";
+
+
+    if (!roomName) {
+
+        error.textContent =
+            "Please enter a room name.";
+
+        return;
+    }
+
+
+    if (!currentUser) {
+
+        alert("Please login first.");
+
+        showPage("loginPage");
+
+        return;
+    }
+
+
+    currentRoomData = {
+
+        roomName: roomName
+    };
+
+
+    showPage("questionModePage");
+}
+
+
+/* =========================================================
+   CREATE ROOM — WEBSITE MODE
+   ========================================================= */
+
+function createWebsiteRoom() {
+
+    createRoom("website");
+}
+
+
+/* =========================================================
+   CREATE ROOM — MANUAL MODE
+   ========================================================= */
+
+function createManualRoom() {
+
+    createRoom("manual");
+}
 
 
 /* =========================================================
    CREATE ROOM
    ========================================================= */
 
-document.getElementById("continueCreateBtn").addEventListener("click", () => {
-
-    const roomName =
-        document.getElementById("roomName").value.trim();
-
-    if (roomName === "") {
-
-        document.getElementById("createError").textContent =
-            "Please enter a room name.";
-
-        return;
-    }
-
-    if (roomName.length < 2) {
-
-        document.getElementById("createError").textContent =
-            "Room name must contain at least 2 characters.";
-
-        return;
-    }
-
-    currentRoom.name = roomName;
-
-    document.getElementById("createError").textContent = "";
-
-    showPage("questionModePage");
-});
-
-
-/* =========================================================
-   QUESTION MODE
-   ========================================================= */
-
-document.getElementById("websiteQuestionBtn")
-    .addEventListener("click", () => {
-
-        createRoom("website");
-
-    });
-
-
-document.getElementById("manualQuestionBtn")
-    .addEventListener("click", () => {
-
-        createRoom("manual");
-
-    });
-
-
-/* =========================================================
-   CREATE ROOM FUNCTION
-   ========================================================= */
-
 function createRoom(mode) {
 
-    currentRoom.mode = mode;
+    if (!currentRoomData) {
+        return;
+    }
 
-    currentRoom.hostCode = generateCode("H");
 
-    currentRoom.teacherCode = generateCode("T");
+    const roomName =
+        currentRoomData.roomName;
 
-    currentRoom.studentCode = generateCode("S");
 
-    document.getElementById("createdRoomName").textContent =
-        currentRoom.name;
+    const codes =
+        generateRoomCodes();
 
-    document.getElementById("hostCode").textContent =
-        currentRoom.hostCode;
 
-    document.getElementById("teacherCode").textContent =
-        currentRoom.teacherCode;
+    const roomId =
+        Date.now().toString();
 
-    document.getElementById("studentCode").textContent =
-        currentRoom.studentCode;
+
+    const room = {
+
+        roomId: roomId,
+
+        roomName: roomName,
+
+        mode: mode,
+
+        hostId: currentUser.id,
+
+        hostName: currentUser.name,
+
+        teacherCode: codes.teacherCode,
+
+        studentCode: codes.studentCode,
+
+        teachers: [],
+
+        students: [],
+
+        handsRaised: [],
+
+        currentQuestion: "",
+
+        createdAt: Date.now(),
+
+        active: true
+    };
+
+
+    const rooms =
+        getData("raiseFirstRooms") || [];
+
+
+    rooms.push(room);
+
+
+    saveData(
+        "raiseFirstRooms",
+        rooms
+    );
+
+
+    currentRoom = roomId;
+
+    currentRole = "host";
+
+    currentQuestionMode = mode;
+
+
+    saveData(
+        "raiseFirstCurrentRoom",
+        currentRoom
+    );
+
+
+    document.getElementById(
+        "createdRoomName"
+    ).textContent = roomName;
+
+
+    document.getElementById(
+        "teacherCode"
+    ).textContent = codes.teacherCode;
+
+
+    document.getElementById(
+        "studentCode"
+    ).textContent = codes.studentCode;
+
+
+    updateCreatedRoomCounts();
+
 
     showPage("roomCreatedPage");
 }
 
 
 /* =========================================================
-   GENERATE ROOM CODES
+   UPDATE CREATED ROOM COUNTS
    ========================================================= */
 
-function generateCode(prefix) {
+function updateCreatedRoomCounts() {
 
-    const characters =
-        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const room =
+        getCurrentRoomData();
 
-    let code = prefix + "-";
-
-    for (let i = 0; i < 6; i++) {
-
-        const randomIndex =
-            Math.floor(Math.random() * characters.length);
-
-        code += characters[randomIndex];
+    if (!room) {
+        return;
     }
 
-    return code;
+
+    const teacherTotal =
+        1 + room.teachers.length;
+
+
+    const studentTotal =
+        room.students.length;
+
+
+    const limitInfo =
+        document.querySelector(
+            ".room-limit-info"
+        );
+
+
+    if (!limitInfo) {
+        return;
+    }
+
+
+    limitInfo.innerHTML = `
+
+        <p>
+            👨‍🏫 Host + Teachers:
+            <strong>
+                ${teacherTotal} / 50
+            </strong>
+        </p>
+
+        <p>
+            👨‍🎓 Students:
+            <strong>
+                ${studentTotal} / 300
+            </strong>
+        </p>
+    `;
 }
 
 
@@ -186,29 +509,30 @@ function copyCode(elementId) {
     const element =
         document.getElementById(elementId);
 
+
     if (!element) {
         return;
     }
 
-    const code = element.textContent;
 
-    navigator.clipboard.writeText(code)
+    const code =
+        element.textContent.trim();
+
+
+    navigator.clipboard
+        .writeText(code)
         .then(() => {
 
-            const oldText = element.textContent;
-
-            element.textContent = "Copied!";
-
-            setTimeout(() => {
-
-                element.textContent = oldText;
-
-            }, 1200);
+            alert(
+                "Code copied: " + code
+            );
 
         })
         .catch(() => {
 
-            alert("Unable to copy the code.");
+            alert(
+                "Code: " + code
+            );
 
         });
 }
@@ -218,248 +542,748 @@ function copyCode(elementId) {
    ENTER HOST ROOM
    ========================================================= */
 
-document.getElementById("enterHostRoomBtn")
-    .addEventListener("click", () => {
+function enterHostRoom() {
 
-        currentUser.role = "host";
+    const room =
+        getCurrentRoomData();
 
-        document.getElementById("hostRoomName").textContent =
-            currentRoom.name;
 
-        showPage("hostRoomPage");
-    });
+    if (!room) {
+        return;
+    }
+
+
+    currentRole = "host";
+
+    currentRoom = room.roomId;
+
+    currentQuestionMode = room.mode;
+
+
+    setupHostPage(room);
+
+    showPage("hostRoomPage");
+}
 
 
 /* =========================================================
-   JOIN ROOM
+   SETUP HOST PAGE
    ========================================================= */
 
-document.getElementById("continueJoinBtn")
-    .addEventListener("click", () => {
+function setupHostPage(room) {
 
-        const code =
-            document.getElementById("roomCodeInput")
-                .value
-                .trim()
-                .toUpperCase();
+    document.getElementById(
+        "hostRoomName"
+    ).textContent = room.roomName;
 
-        if (code === "") {
 
-            document.getElementById("joinError").textContent =
-                "Please enter a room code.";
+    updateHostCounts(room);
+
+    updateHostQuestionMode(room);
+
+    renderHostHands(room);
+}
+
+
+/* =========================================================
+   UPDATE HOST COUNTS
+   ========================================================= */
+
+function updateHostCounts(room) {
+
+    const teacherCount =
+        1 + room.teachers.length;
+
+
+    const studentCount =
+        room.students.length;
+
+
+    document.getElementById(
+        "hostTeacherCount"
+    ).textContent = teacherCount;
+
+
+    document.getElementById(
+        "hostStudentCount"
+    ).textContent = studentCount;
+}
+
+
+/* =========================================================
+   HOST QUESTION MODE
+   ========================================================= */
+
+function updateHostQuestionMode(room) {
+
+    const questionArea =
+        document.getElementById(
+            "hostQuestionArea"
+        );
+
+    const manualMessage =
+        document.getElementById(
+            "hostManualMessage"
+        );
+
+
+    if (room.mode === "website") {
+
+        questionArea.classList.remove(
+            "hidden"
+        );
+
+        manualMessage.classList.add(
+            "hidden"
+        );
+
+    } else {
+
+        questionArea.classList.add(
+            "hidden"
+        );
+
+        manualMessage.classList.remove(
+            "hidden"
+        );
+    }
+}
+
+
+/* =========================================================
+   JOIN PAGE
+   ========================================================= */
+
+function openJoinPage() {
+
+    document.getElementById(
+        "roomCodeInput"
+    ).value = "";
+
+
+    document.getElementById(
+        "joinError"
+    ).textContent = "";
+
+
+    showPage("joinPage");
+}
+
+
+/* =========================================================
+   FIND ROOM BY CODE
+   ========================================================= */
+
+function findRoomByCode(code) {
+
+    const rooms =
+        getData("raiseFirstRooms") || [];
+
+
+    return rooms.find(
+        room =>
+            room.active &&
+            (
+                room.teacherCode === code ||
+                room.studentCode === code
+            )
+    );
+}
+
+
+/* =========================================================
+   JOIN USING CODE
+   ========================================================= */
+
+function continueJoin() {
+
+    const input =
+        document.getElementById(
+            "roomCodeInput"
+        );
+
+
+    const error =
+        document.getElementById(
+            "joinError"
+        );
+
+
+    const code =
+        input.value
+            .trim()
+            .toUpperCase();
+
+
+    error.textContent = "";
+
+
+    if (!code) {
+
+        error.textContent =
+            "Please enter a room code.";
+
+        return;
+    }
+
+
+    const room =
+        findRoomByCode(code);
+
+
+    if (!room) {
+
+        error.textContent =
+            "Invalid or expired room code.";
+
+        return;
+    }
+
+
+    currentRoom =
+        room.roomId;
+
+
+    currentQuestionMode =
+        room.mode;
+
+
+    if (code === room.teacherCode) {
+
+        currentRole = "teacher";
+
+
+        if (
+            1 + room.teachers.length >= 50
+        ) {
+
+            error.textContent =
+                "Teacher limit reached.";
 
             return;
         }
 
-        /*
-         * In the real version Firebase will check
-         * whether this code actually exists.
-         */
 
-        joinedRoomCode = code;
-
-        document.getElementById("joinError").textContent = "";
-
-        showPage("joinRolePage");
-    });
+        document.getElementById(
+            "teacherName"
+        ).value = "";
 
 
-/* =========================================================
-   CHOOSE TEACHER
-   ========================================================= */
+        document.getElementById(
+            "teacherError"
+        ).textContent = "";
 
-document.getElementById("teacherJoinBtn")
-    .addEventListener("click", () => {
-
-        currentUser.role = "teacher";
-
-        document.getElementById("teacherName").value = "";
 
         showPage("teacherDetailsPage");
-    });
 
 
-/* =========================================================
-   CHOOSE STUDENT
-   ========================================================= */
+    } else {
 
-document.getElementById("studentJoinBtn")
-    .addEventListener("click", () => {
 
-        currentUser.role = "student";
+        currentRole = "student";
 
-        document.getElementById("studentName").value = "";
 
-        document.getElementById("rollNumber").value = "";
+        if (
+            room.students.length >= 300
+        ) {
+
+            error.textContent =
+                "Student limit reached.";
+
+            return;
+        }
+
+
+        document.getElementById(
+            "studentName"
+        ).value = "";
+
+
+        document.getElementById(
+            "rollNumber"
+        ).value = "";
+
+
+        document.getElementById(
+            "studentError"
+        ).textContent = "";
+
 
         showPage("studentDetailsPage");
-    });
-
-
-/* =========================================================
-   JOIN AS STUDENT
-   ========================================================= */
-
-document.getElementById("joinAsStudentBtn")
-    .addEventListener("click", () => {
-
-        const name =
-            document.getElementById("studentName")
-                .value
-                .trim();
-
-        const rollNumber =
-            document.getElementById("rollNumber")
-                .value
-                .trim();
-
-        if (name === "") {
-
-            document.getElementById("studentError").textContent =
-                "Please enter your name.";
-
-            return;
-        }
-
-        if (rollNumber === "") {
-
-            document.getElementById("studentError").textContent =
-                "Please enter your roll number.";
-
-            return;
-        }
-
-        currentUser.name = name;
-
-        currentUser.rollNumber = rollNumber;
-
-        currentUser.role = "student";
-
-        document.getElementById("studentWelcome").textContent =
-            "Welcome, " + name + " 👋";
-
-        document.getElementById("studentRoomName").textContent =
-            joinedRoomCode;
-
-        document.getElementById("handStatus").textContent =
-            "Waiting for the next question...";
-
-        showPage("studentRoomPage");
-    });
+    }
+}
 
 
 /* =========================================================
    JOIN AS TEACHER
    ========================================================= */
 
-document.getElementById("joinAsTeacherBtn")
-    .addEventListener("click", () => {
+function joinAsTeacher() {
 
-        const name =
-            document.getElementById("teacherName")
-                .value
-                .trim();
+    const name =
+        document.getElementById(
+            "teacherName"
+        ).value.trim();
 
-        if (name === "") {
 
-            document.getElementById("teacherError").textContent =
-                "Please enter your name.";
+    const error =
+        document.getElementById(
+            "teacherError"
+        );
 
-            return;
-        }
 
-        currentUser.name = name;
+    error.textContent = "";
 
-        currentUser.role = "teacher";
 
-        document.getElementById("teacherRoomName").textContent =
-            joinedRoomCode;
+    if (!name) {
 
-        showPage("teacherRoomPage");
-    });
+        error.textContent =
+            "Please enter your name.";
+
+        return;
+    }
+
+
+    const room =
+        getCurrentRoomData();
+
+
+    if (!room) {
+
+        error.textContent =
+            "Room not found.";
+
+        return;
+    }
+
+
+    if (
+        1 + room.teachers.length >= 50
+    ) {
+
+        error.textContent =
+            "Teacher limit reached.";
+
+        return;
+    }
+
+
+    const teacher = {
+
+        id:
+            "teacher_" +
+            Date.now(),
+
+        name: name,
+
+        joinedAt: Date.now()
+    };
+
+
+    room.teachers.push(teacher);
+
+
+    saveRoom(room);
+
+
+    setupTeacherPage(room);
+
+
+    showPage("teacherRoomPage");
+}
 
 
 /* =========================================================
-   RAISE HAND
+   JOIN AS STUDENT
    ========================================================= */
 
-document.getElementById("raiseHandBtn")
-    .addEventListener("click", () => {
+function joinAsStudent() {
 
-        raiseHand();
+    const name =
+        document.getElementById(
+            "studentName"
+        ).value.trim();
 
-    });
 
+    const roll =
+        document.getElementById(
+            "rollNumber"
+        ).value.trim();
+
+
+    const error =
+        document.getElementById(
+            "studentError"
+        );
+
+
+    error.textContent = "";
+
+
+    if (!name) {
+
+        error.textContent =
+            "Please enter your name.";
+
+        return;
+    }
+
+
+    if (!roll) {
+
+        error.textContent =
+            "Please enter your roll number.";
+
+        return;
+    }
+
+
+    const room =
+        getCurrentRoomData();
+
+
+    if (!room) {
+
+        error.textContent =
+            "Room not found.";
+
+        return;
+    }
+
+
+    if (
+        room.students.length >= 300
+    ) {
+
+        error.textContent =
+            "Student limit reached.";
+
+        return;
+    }
+
+
+    const student = {
+
+        id:
+            "student_" +
+            Date.now(),
+
+        name: name,
+
+        rollNumber: roll,
+
+        joinedAt: Date.now()
+    };
+
+
+    room.students.push(student);
+
+
+    saveRoom(room);
+
+
+    currentUser = student;
+
+
+    setupStudentPage(room);
+
+
+    showPage("studentRoomPage");
+}
+
+
+/* =========================================================
+   SETUP STUDENT PAGE
+   ========================================================= */
+
+function setupStudentPage(room) {
+
+    document.getElementById(
+        "studentRoomName"
+    ).textContent = room.roomName;
+
+
+    updateStudentCount(room);
+
+
+    updateStudentQuestion(room);
+
+
+    document.getElementById(
+        "handStatus"
+    ).textContent =
+        "Ready to raise your hand.";
+
+
+    const button =
+        document.getElementById(
+            "raiseHandBtn"
+        );
+
+
+    button.disabled = false;
+}
+
+
+/* =========================================================
+   UPDATE STUDENT COUNT
+   ========================================================= */
+
+function updateStudentCount(room) {
+
+    document.getElementById(
+        "studentCount"
+    ).textContent =
+        room.students.length;
+}
+
+
+/* =========================================================
+   STUDENT QUESTION
+   ========================================================= */
+
+function updateStudentQuestion(room) {
+
+    const questionBox =
+        document.getElementById(
+            "studentQuestionBox"
+        );
+
+
+    const manualMessage =
+        document.getElementById(
+            "manualQuestionMessage"
+        );
+
+
+    const question =
+        document.getElementById(
+            "currentQuestion"
+        );
+
+
+    if (room.mode === "website") {
+
+        questionBox.classList.remove(
+            "hidden"
+        );
+
+        manualMessage.classList.add(
+            "hidden"
+        );
+
+
+        if (room.currentQuestion) {
+
+            question.textContent =
+                room.currentQuestion;
+
+        } else {
+
+            question.textContent =
+                "Waiting for question...";
+        }
+
+    } else {
+
+        questionBox.classList.add(
+            "hidden"
+        );
+
+        manualMessage.classList.remove(
+            "hidden"
+        );
+    }
+}
+
+
+/* =========================================================
+   SETUP TEACHER PAGE
+   ========================================================= */
+
+function setupTeacherPage(room) {
+
+    document.getElementById(
+        "teacherRoomName"
+    ).textContent =
+        room.roomName;
+
+
+    updateTeacherCount(room);
+
+
+    updateTeacherQuestionMode(room);
+
+
+    renderTeacherHands(room);
+}
+
+
+/* =========================================================
+   UPDATE TEACHER COUNT
+   ========================================================= */
+
+function updateTeacherCount(room) {
+
+    document.getElementById(
+        "teacherCount"
+    ).textContent =
+        room.teachers.length;
+}
+
+
+/* =========================================================
+   TEACHER QUESTION MODE
+   ========================================================= */
+
+function updateTeacherQuestionMode(room) {
+
+    const questionArea =
+        document.getElementById(
+            "teacherQuestionArea"
+        );
+
+
+    const manualMessage =
+        document.getElementById(
+            "teacherManualMessage"
+        );
+
+
+    if (room.mode === "website") {
+
+        questionArea.classList.remove(
+            "hidden"
+        );
+
+        manualMessage.classList.add(
+            "hidden"
+        );
+
+    } else {
+
+        questionArea.classList.add(
+            "hidden"
+        );
+
+        manualMessage.classList.remove(
+            "hidden"
+        );
+    }
+}
+
+
+/* =========================================================
+   STUDENT RAISE HAND
+   ========================================================= */
 
 function raiseHand() {
 
-    /*
-     * Prevent the same student from raising
-     * their hand multiple times.
-     */
+    if (currentRole !== "student") {
+        return;
+    }
 
-    const alreadyRaised = raisedHands.some(
-        person => person.name === currentUser.name
-    );
+
+    const room =
+        getCurrentRoomData();
+
+
+    if (!room) {
+        return;
+    }
+
+
+    const studentId =
+        currentUser.id;
+
+
+    const alreadyRaised =
+        room.handsRaised.find(
+            hand =>
+                hand.studentId === studentId
+        );
+
 
     if (alreadyRaised) {
 
-        document.getElementById("handStatus").textContent =
+        document.getElementById(
+            "handStatus"
+        ).textContent =
             "✋ Your hand is already raised.";
 
         return;
     }
 
 
-    const participant = {
+    const student =
+        room.students.find(
+            s =>
+                s.id === studentId
+        );
 
-        name: currentUser.name,
 
-        rollNumber: currentUser.rollNumber,
+    if (!student) {
+        return;
+    }
 
-        time: Date.now(),
 
-        position: raisedHands.length + 1
+    const hand = {
+
+        studentId: student.id,
+
+        name: student.name,
+
+        rollNumber: student.rollNumber,
+
+        raisedAt: Date.now()
     };
 
 
-    raisedHands.push(participant);
+    room.handsRaised.push(hand);
 
 
-    /*
-     * Update the student's screen.
-     */
-
-    document.getElementById("handStatus").textContent =
-        "✋ Hand raised! You are #" +
-        participant.position;
+    room.handsRaised.sort(
+        (a, b) =>
+            a.raisedAt - b.raisedAt
+    );
 
 
-    /*
-     * Update teacher/host screen.
-     */
+    saveRoom(room);
 
-    updateHandList();
+
+    document.getElementById(
+        "handStatus"
+    ).textContent =
+        "✋ Hand raised! Waiting for teacher.";
+
+
+    document.getElementById(
+        "raiseHandBtn"
+    ).disabled = true;
 }
 
 
 /* =========================================================
-   UPDATE HAND LIST
+   RENDER TEACHER HANDS
    ========================================================= */
 
-function updateHandList() {
+function renderTeacherHands(room) {
 
     const list =
-        document.getElementById("handList");
+        document.getElementById(
+            "teacherHandList"
+        );
+
 
     if (!list) {
         return;
     }
 
-    list.innerHTML = "";
 
-
-    if (raisedHands.length === 0) {
+    if (
+        !room.handsRaised ||
+        room.handsRaised.length === 0
+    ) {
 
         list.innerHTML = `
             <p class="empty-message">
@@ -471,251 +1295,72 @@ function updateHandList() {
     }
 
 
-    raisedHands.forEach((person, index) => {
-
-        const item =
-            document.createElement("div");
-
-        item.className = "hand-item";
+    list.innerHTML = "";
 
 
-        let medal = "";
+    room.handsRaised.forEach(
+        (hand, index) => {
 
-        if (index === 0) {
-            medal = "🥇";
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "hand-item";
+
+
+            item.innerHTML = `
+
+                <div>
+
+                    <strong>
+                        ${index + 1}. ${escapeHTML(hand.name)}
+                    </strong>
+
+                    <small>
+                        Roll No: ${escapeHTML(hand.rollNumber)}
+                    </small>
+
+                </div>
+
+                <span>
+                    🙋
+                </span>
+            `;
+
+
+            list.appendChild(item);
         }
-        else if (index === 1) {
-            medal = "🥈";
-        }
-        else if (index === 2) {
-            medal = "🥉";
-        }
-        else {
-            medal = `${index + 1}.`;
-        }
-
-
-        item.innerHTML = `
-            <div>
-                <strong>
-                    ${medal} ${escapeHTML(person.name)}
-                </strong>
-
-                <small>
-                    Roll No: ${escapeHTML(person.rollNumber)}
-                </small>
-            </div>
-        `;
-
-
-        list.appendChild(item);
-
-    });
+    );
 }
 
 
 /* =========================================================
-   RESET HANDS
+   RENDER HOST HANDS
    ========================================================= */
 
-document.getElementById("resetHandsBtn")
-    .addEventListener("click", () => {
+function renderHostHands(room) {
 
-        resetHands();
-
-    });
-
-
-document.getElementById("hostResetBtn")
-    .addEventListener("click", () => {
-
-        resetHands();
-
-    });
-
-
-function resetHands() {
-
-    raisedHands = [];
-
-    updateHandList();
-
-
-    const status =
-        document.getElementById("handStatus");
-
-    if (status) {
-
-        status.textContent =
-            "Waiting for the next question...";
-
-    }
-
-    const raiseButton =
-        document.getElementById("raiseHandBtn");
-
-    if (raiseButton) {
-
-        raiseButton.disabled = false;
-
-    }
-}
-
-
-/* =========================================================
-   END ROOM
-   ========================================================= */
-
-document.getElementById("endRoomBtn")
-    .addEventListener("click", () => {
-
-        const confirmEnd =
-            confirm(
-                "Are you sure you want to end this room?"
-            );
-
-        if (!confirmEnd) {
-            return;
-        }
-
-        currentRoom = {
-
-            name: "",
-
-            mode: "",
-
-            hostCode: "",
-
-            teacherCode: "",
-
-            studentCode: ""
-
-        };
-
-        currentUser = {
-
-            name: "",
-
-            rollNumber: "",
-
-            role: ""
-
-        };
-
-        raisedHands = [];
-
-        joinedRoomCode = "";
-
-        showPage("homePage");
-    });
-
-
-/* =========================================================
-   VIEW MEMBERS
-   ========================================================= */
-
-document.getElementById("viewMembersBtn")
-    .addEventListener("click", () => {
-
-        alert(
-            "Member list will be connected to Firebase."
+    const list =
+        document.getElementById(
+            "hostHandList"
         );
 
-    });
 
-
-/* =========================================================
-   WEBSITE QUESTION MODE
-   ========================================================= */
-
-function showQuestion(question) {
-
-    const questionDisplay =
-        document.getElementById("questionDisplay");
-
-    const currentQuestion =
-        document.getElementById("currentQuestion");
-
-
-    if (!questionDisplay || !currentQuestion) {
+    if (!list) {
         return;
     }
 
 
-    currentQuestion.textContent = question;
+    if (
+        !room.handsRaised ||
+        room.handsRaised.length === 0
+    ) {
 
-    questionDisplay.classList.remove("hidden");
-}
-
-
-/* =========================================================
-   CLEAR QUESTIONS
-   ========================================================= */
-
-function clearQuestion() {
-
-    const questionDisplay =
-        document.getElementById("questionDisplay");
-
-    const currentQuestion =
-        document.getElementById("currentQuestion");
-
-
-    if (questionDisplay) {
-
-        questionDisplay.classList.add("hidden");
-
-    }
-
-    if (currentQuestion) {
-
-        currentQuestion.textContent =
-            "Waiting for question...";
-
-    }
-}
-
-
-/* =========================================================
-   ERROR MESSAGE CLEANUP
-   ========================================================= */
-
-function clearMessages() {
-
-    const messages = document.querySelectorAll(
-        ".error-message"
-    );
-
-    messages.forEach(message => {
-
-        message.textContent = "";
-
-    });
-}
-
-
-/* =========================================================
-   SECURITY HELPER
-   ========================================================= */
-
-function escapeHTML(value) {
-
-    return String(value)
-
-        .replace(/&/g, "&amp;")
-
-        .replace(/</g, "&lt;")
-
-        .replace(/>/g, "&gt;")
-
-        .replace(/"/g, "&quot;")
-
-        .replace(/'/g, "&#039;");
-}
-
-
-/* =========================================================
-   INITIAL PAGE
-   ========================================================= */
-
-showPage("homePage");
+        list.innerHTML = `
+            <p class="empty-message">
+                No hands raised yet.
+            </p>
+        `;
