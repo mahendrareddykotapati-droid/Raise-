@@ -7,53 +7,33 @@
 body {
     font-family: Arial, sans-serif;
     background: #f4f7fb;
-    color: #202124;
+    color: #222;
 }
 
+.page,
+.classroom-page {
+    min-height: 100vh;
+}
 
-/* =====================================================
-   GENERAL
-===================================================== */
+.page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
 
 .hidden {
     display: none !important;
 }
 
-.page {
-    min-height: 100vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-}
-
-
-/* =====================================================
-   CARD
-===================================================== */
-
 .card {
     width: 100%;
     max-width: 420px;
-
     background: white;
-
-    border: 1px solid #dadce0;
+    padding: 30px;
     border-radius: 18px;
-
-    padding: 38px 30px;
-
+    box-shadow: 0 8px 30px rgba(0,0,0,.10);
     text-align: center;
-
-    box-shadow:
-        0 4px 20px rgba(0, 0, 0, 0.06);
-}
-
-.logo {
-    font-size: 42px;
-    margin-bottom: 10px;
 }
 
 .card h1 {
@@ -62,475 +42,256 @@ body {
 }
 
 .card h2 {
-    font-size: 24px;
-    margin-bottom: 10px;
+    margin: 20px 0;
 }
 
-.subtitle {
-    color: #5f6368;
-    font-size: 15px;
-    margin-bottom: 25px;
+.card p {
+    color: #666;
+    margin-bottom: 18px;
 }
-
-
-/* =====================================================
-   INPUT
-===================================================== */
 
 input {
     width: 100%;
-
-    padding: 14px 15px;
-
+    padding: 14px;
     margin-bottom: 14px;
-
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-
+    border: 1px solid #d5d9df;
+    border-radius: 10px;
     font-size: 16px;
-
     outline: none;
-
-    background: white;
 }
 
 input:focus {
-    border: 2px solid #2563eb;
+    border-color: #2563eb;
 }
-
-
-/* =====================================================
-   BUTTONS
-===================================================== */
 
 button {
     width: 100%;
-
+    padding: 14px;
     border: none;
-    border-radius: 8px;
-
-    padding: 13px 15px;
-
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
     font-size: 16px;
     font-weight: bold;
-
     cursor: pointer;
-
     margin-bottom: 12px;
-
-    transition: 0.15s;
 }
 
 button:active {
-    transform: scale(0.98);
+    transform: scale(.98);
 }
 
-.primary-btn {
-    background: #2563eb;
-    color: white;
+.secondary {
+    background: #777;
 }
 
-.primary-btn:hover {
-    background: #1d4ed8;
+.danger {
+    background: #dc2626;
 }
 
-.secondary-btn {
-    background: #e8eaed;
-    color: #202124;
+.error-message {
+    color: #dc2626 !important;
+    font-size: 14px;
+    min-height: 20px;
+    margin-top: 8px;
 }
 
-.secondary-btn:hover {
-    background: #dadce0;
+.switchText {
+    margin-top: 15px;
 }
 
-.link-btn {
-    background: transparent;
+.switchText span {
     color: #2563eb;
+    font-weight: bold;
+    cursor: pointer;
 }
-
-.link-btn:hover {
-    background: #f0f4ff;
-}
-
-.back-btn {
-    width: auto;
-
-    background: transparent;
-    color: #2563eb;
-
-    padding: 5px;
-
-    display: block;
-
-    text-align: left;
-}
-
-
-/* =====================================================
-   RECAPTCHA
-===================================================== */
 
 #loginRecaptcha,
 #registerRecaptcha {
+    margin: 10px auto 15px;
     display: flex;
     justify-content: center;
-
-    margin-bottom: 15px;
-
-    overflow: hidden;
 }
 
-
-/* =====================================================
-   ERROR
-===================================================== */
-
-.error-message {
-    color: #d93025;
-
-    font-size: 14px;
-
-    margin-top: 8px;
-
-    min-height: 20px;
-}
-
-
-/* =====================================================
-   SWITCH
-===================================================== */
-
-.switch-text {
-    color: #5f6368;
-
-    font-size: 14px;
-
-    margin-top: 20px;
-}
-
-
-/* =====================================================
-   CLASSROOM
-===================================================== */
-
-.classroom-page {
-    min-height: 100vh;
-
-    background: #f4f7fb;
-}
-
-.class-header {
-    height: 75px;
-
-    background: white;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    padding: 10px 18px;
-
-    box-shadow:
-        0 2px 10px rgba(0, 0, 0, 0.08);
-}
-
-.class-header h2 {
-    font-size: 20px;
-}
-
-#classCodeDisplay {
-    color: #666;
-    font-size: 13px;
-    margin-top: 3px;
-}
-
-
-/* =====================================================
-   MEMBER COUNT
-===================================================== */
-
-.member-count-circle {
-    width: 40px;
-    height: 40px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    border: 2px solid #e5e5e5;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-}
-
-.member-count-circle span {
-    color: #16a34a;
-
-    font-size: 17px;
-
-    font-weight: bold;
-}
-
-
-/* =====================================================
-   CLASSROOM CONTENT
-===================================================== */
-
-.classroom-content {
-    max-width: 700px;
-
-    margin: auto;
-
-    padding: 22px 15px;
-}
-
-.area {
-    background: white;
-
-    border-radius: 16px;
-
-    padding: 22px;
-
-    margin-bottom: 18px;
-
-    box-shadow:
-        0 4px 18px rgba(0, 0, 0, 0.06);
-}
-
-.student-area h2 {
-    margin-bottom: 8px;
-}
-
-.student-area p {
-    color: #666;
-
-    margin-bottom: 18px;
-}
-
-
-/* =====================================================
-   RAISE HAND
-===================================================== */
-
-.raise-button {
-    background: #f59e0b;
-
-    color: white;
-
-    font-size: 18px;
-
-    padding: 16px;
-}
-
-.raise-button.hand-raised {
-    background: #16a34a;
-}
-
-.hand-status {
-    text-align: center;
-
-    font-weight: bold;
-
-    margin-top: 8px;
-}
-
-
-/* =====================================================
-   RANKING
-===================================================== */
-
-.teacher-area h2 {
-    margin-bottom: 6px;
-}
-
-.small-text {
-    color: #777;
-
-    font-size: 14px;
-
-    margin-bottom: 18px;
-}
-
-.ranking-item {
-    display: flex;
-
-    align-items: center;
-
-    padding: 13px;
-
-    margin-bottom: 10px;
-
+.created-room-name {
     background: #f5f7fa;
-
-    border-radius: 10px;
-}
-
-.rank-number {
-    width: 34px;
-    height: 34px;
-
-    border-radius: 50%;
-
-    background: #2563eb;
-
-    color: white;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-weight: bold;
-
-    margin-right: 12px;
-}
-
-.student-rank-name {
-    font-weight: bold;
-}
-
-.empty-message {
-    text-align: center;
-
-    color: #888;
-
-    padding: 20px;
-}
-
-.reset-button {
-    margin-top: 15px;
-
-    background: #dc2626;
-
-    color: white;
-}
-
-
-/* =====================================================
-   QUESTIONS
-===================================================== */
-
-.question-area h2 {
-    margin-bottom: 15px;
-}
-
-.question-item {
-    background: #f5f7fa;
-
-    padding: 13px;
-
-    border-radius: 10px;
-
-    margin-bottom: 10px;
-}
-
-.question-name {
-    font-weight: bold;
-
-    margin-bottom: 5px;
-}
-
-.question-text {
-    color: #555;
-}
-
-.question-input-area {
-    margin-top: 18px;
-}
-
-
-/* =====================================================
-   ROOM CREATED
-===================================================== */
-
-.room-name-box {
-    background: #f5f7fa;
-
-    border-radius: 10px;
-
     padding: 15px;
-
+    border-radius: 10px;
     margin-bottom: 15px;
 }
 
-.room-name-box span {
+.created-room-name span {
     display: block;
-
     color: #777;
-
     font-size: 13px;
-
-    margin-bottom: 5px;
 }
 
-.room-name-box strong {
-    font-size: 18px;
+.created-room-name strong {
+    display: block;
+    font-size: 20px;
+    margin-top: 5px;
 }
 
 .code-card {
     background: #f5f7fa;
-
     border-radius: 12px;
-
     padding: 15px;
-
     margin-bottom: 15px;
 }
 
-.code-card span {
-    display: block;
-
-    color: #666;
-
-    font-size: 14px;
-
-    margin-bottom: 7px;
+.code-card p {
+    margin-bottom: 8px;
 }
 
 .code-card strong {
     display: block;
-
     font-size: 25px;
-
     letter-spacing: 3px;
-
     margin-bottom: 10px;
 }
 
-.small-btn {
-    background: #e8eaed;
-
-    color: #202124;
-
-    padding: 9px;
-
+.code-card button {
+    background: #16a34a;
     margin-bottom: 0;
 }
 
+.classHeader {
+    height: 75px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 18px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.08);
+}
 
-/* =====================================================
-   MOBILE
-===================================================== */
+.classHeader h2 {
+    font-size: 20px;
+}
+
+#classCodeDisplay {
+    font-size: 13px;
+    color: #666;
+    margin-top: 3px;
+}
+
+.memberCountCircle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.memberCountCircle span {
+    color: #16a34a;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.classroomContent {
+    max-width: 700px;
+    margin: auto;
+    padding: 25px 18px;
+}
+
+.studentArea,
+.teacherArea,
+.questionArea {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.07);
+}
+
+.studentArea h2 {
+    margin-bottom: 15px;
+}
+
+.raiseButton {
+    background: #f59e0b;
+    font-size: 18px;
+    padding: 16px;
+}
+
+.raiseButton.handRaised {
+    background: #16a34a;
+}
+
+#handStatus {
+    text-align: center;
+    font-weight: bold;
+}
+
+.rankingItem {
+    display: flex;
+    align-items: center;
+    padding: 13px;
+    margin-bottom: 10px;
+    background: #f5f7fa;
+    border-radius: 10px;
+}
+
+.rankNumber {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2563eb;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 12px;
+}
+
+.studentRankName {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.emptyMessage {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+}
+
+.resetButton {
+    background: #dc2626;
+    margin-top: 15px;
+}
+
+.questionItem {
+    background: #f5f7fa;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.questionName {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.questionText {
+    color: #555;
+}
 
 @media (max-width: 500px) {
 
     .card {
-        padding: 30px 20px;
+        padding: 24px 18px;
     }
 
-    .classroom-content {
-        padding: 15px 10px;
-    }
-
-    .area {
-        padding: 18px;
-    }
-
-    .class-header {
+    .classHeader {
         padding: 10px 14px;
+    }
+
+    .classroomContent {
+        padding: 18px 12px;
     }
 }
