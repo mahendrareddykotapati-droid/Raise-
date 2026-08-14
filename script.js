@@ -1,713 +1,1187 @@
-====================================================
-   RAISE HAND CLASSROOM
+/* =====================================================
+   FIREBASE IMPORTS
 ===================================================== */
 
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
-/* =========================
-   GLOBAL VARIABLES
-========================= */
+import {
+    getAuth,
+    RecaptchaVerifier,
+    signInWithPhoneNumber,
+    signOut,
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    onSnapshot,
+    arrayUnion,
+    serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+/* =====================================================
+   FIREBASE CONFIG
+   REPLACE THESE VALUES WITH YOUR FIREBASE CONFIG
+===================================================== */
+
+const firebaseConfig = {
+
+    apiKey: "YOUR_API_KEY",
+
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+
+    projectId: "YOUR_PROJECT_ID",
+
+    storageBucket: "YOUR_PROJECT.firebasestorage.app",
+
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+
+    appId: "YOUR_APP_ID"
+
+};
+
+
+/* =====================================================
+   INITIALIZE FIREBASE
+===================================================== */
+
+const app =
+    initializeApp(firebaseConfig);
+
+const auth =
+    getAuth(app);
+
+const db =
+    getFirestore(app);
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
 
 let currentUser = null;
-let currentClassCode = null;
+
+let currentUserData = null;
+
+let currentRoomCode = null;
+
 let isHost = false;
 
-let registeredUsers =
-    JSON.parse(localStorage.getItem("registeredUsers")) || {};
+let loginConfirmation = null;
 
-let classrooms =
-    JSON.parse(localStorage.getItem("classrooms")) || {};
+let registerConfirmation = null;
 
+let loginRecaptcha = null;
 
-/* =========================
-   PAGE FUNCTIONS
-========================= */
+let registerRecaptcha = null;
 
-function hideAllPages() {
-
-    document.getElementById("registerPage")
-        .classList.add("hidden");
-
-    document.getElementById("loginPage")
-        .classList.add("hidden");
-
-    document.getElementById("homePage")
-        .classList.add("hidden");
-
-    document.getElementById("joinPage")
-        .classList.add("hidden");
-
-    document.getElementById("classroomPage")
-        .classList.add("hidden");
-}
+let unsubscribeRoom = null;
 
 
-/* =========================
-   SHOW REGISTER
-========================= */
+/* =====================================================
+   PAGE CONTROL
+===================================================== */
 
-function showRegister() {
+function showPage(id) {
 
-    hideAllPages();
+    document
+        .querySelectorAll(".page, .classroom-page")
+        .forEach(page => {
 
-    document.getElementById("registerPage")
+            page.classList.add("hidden");
+
+        });
+
+    document
+        .getElementById(id)
         .classList.remove("hidden");
 }
 
 
-/* =========================
-   SHOW LOGIN
-========================= */
+/* =====================================================
+   ERROR
+===================================================== */
 
-function showLogin() {
+function errorMessage(id, message) {
 
-    hideAllPages();
+    const element =
+        document.getElementById(id);
 
-    document.getElementById("loginPage")
-        .classList.remove("hidden");
+    element.textContent = message;
 }
 
 
-/* =========================
-   REGISTER USER
-========================= */
+/* =====================================================
+   PHONE
+===================================================== */
 
-function registerUser() {
+function validPhone(phone) {
+
+    return /^[0-9]{10}$/.test(phone);
+}
+
+function firebasePhone(phone) {
+
+    return "+91" + phone;
+}
+
+
+/* =====================================================
+   LOGIN RECAPTCHA
+===================================================== */
+
+function setupLoginRecaptcha() {
+
+    if (loginRecaptcha) {
+
+        try {
+            loginRecaptcha.clear();
+        } catch (e) {}
+
+    }
+
+    loginRecaptcha =
+        new RecaptchaVerifier(
+            auth,
+            "loginRecaptcha",
+            {
+                size: "normal"
+            }
+        );
+
+    return loginRecaptcha.render();
+}
+
+
+/* =====================================================
+   REGISTER RECAPTCHA
+===================================================== */
+
+function setupRegisterRecaptcha() {
+
+    if (registerRecaptcha) {
+
+        try {
+            registerRecaptcha.clear();
+        } catch (e) {}
+
+    }
+
+    registerRecaptcha =
+        new RecaptchaVerifier(
+            auth,
+            "registerRecaptcha",
+            {
+                size: "normal"
+            }
+        );
+
+    return registerRecaptcha.render();
+}
+
+
+/* =====================================================
+   REGISTER — SEND OTP
+===================================================== */
+
+async function sendRegisterOTP() {
+
+    errorMessage(
+        "registerError",
+        ""
+    );
 
     const name =
-        document.getElementById("registerName")
-        .value.trim();
+        document
+            .getElementById("registerName")
+            .value
+            .trim();
 
     const phone =
-        document.getElementById("registerPhone")
-        .value.trim();
+        document
+            .getElementById("registerPhone")
+            .value
+            .trim();
 
 
-    /* NAME CHECK */
+    if (!name) {
 
-    if (name === "") {
-
-        alert("Please enter your name.");
-
-        return;
-    }
-
-
-    /* PHONE CHECK */
-
-    if (!/^[0-9]{10}$/.test(phone)) {
-
-        alert("Please enter a valid 10-digit phone number.");
-
-        return;
-    }
-
-
-    /* ALREADY REGISTERED */
-
-    if (registeredUsers[phone]) {
-
-        alert(
-            "This phone number is already registered. Please login."
-        );
-
-        showLogin();
-
-        return;
-    }
-
-
-    /* SAVE USER */
-
-    registeredUsers[phone] = {
-
-        name: name,
-        phone: phone
-
-    };
-
-
-    localStorage.setItem(
-        "registeredUsers",
-        JSON.stringify(registeredUsers)
-    );
-
-
-    alert("Registration successful!");
-
-
-    /* CLEAR */
-
-    document.getElementById("registerName").value = "";
-    document.getElementById("registerPhone").value = "";
-
-
-    showLogin();
-}
-
-
-/* =========================
-   LOGIN USER
-========================= */
-
-function loginUser() {
-
-    const phone =
-        document.getElementById("loginPhone")
-        .value.trim();
-
-
-    if (!/^[0-9]{10}$/.test(phone)) {
-
-        alert("Please enter a valid 10-digit phone number.");
-
-        return;
-    }
-
-
-    const user = registeredUsers[phone];
-
-
-    if (!user) {
-
-        alert(
-            "This number is not registered. Please register first."
+        errorMessage(
+            "registerError",
+            "Please enter your name."
         );
 
         return;
     }
 
 
-    currentUser = user;
+    if (!validPhone(phone)) {
+
+        errorMessage(
+            "registerError",
+            "Enter a valid 10-digit mobile number."
+        );
+
+        return;
+    }
 
 
-    localStorage.setItem(
-        "currentUser",
-        JSON.stringify(currentUser)
-    );
+    try {
+
+        const phoneNumber =
+            firebasePhone(phone);
 
 
-    document.getElementById("loginPhone").value = "";
+        const existing =
+            await getDoc(
+                doc(
+                    db,
+                    "phoneUsers",
+                    phoneNumber
+                )
+            );
 
 
-    showHome();
+        if (existing.exists()) {
+
+            errorMessage(
+                "registerError",
+                "This number is already registered. Please sign in."
+            );
+
+            return;
+        }
+
+
+        if (!registerRecaptcha) {
+
+            await setupRegisterRecaptcha();
+
+        }
+
+
+        registerConfirmation =
+            await signInWithPhoneNumber(
+                auth,
+                phoneNumber,
+                registerRecaptcha
+            );
+
+
+        document
+            .getElementById("registerOtpBox")
+            .classList
+            .remove("hidden");
+
+
+        errorMessage(
+            "registerError",
+            "OTP sent successfully."
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "registerError",
+            error.message
+        );
+
+        registerRecaptcha = null;
+
+    }
+
 }
 
 
-/* =========================
-   HOME PAGE
-========================= */
+/* =====================================================
+   REGISTER — VERIFY OTP
+===================================================== */
+
+async function verifyRegisterOTP() {
+
+    const name =
+        document
+            .getElementById("registerName")
+            .value
+            .trim();
+
+    const otp =
+        document
+            .getElementById("registerOtp")
+            .value
+            .trim();
+
+
+    if (!registerConfirmation) {
+
+        errorMessage(
+            "registerError",
+            "Please request an OTP first."
+        );
+
+        return;
+    }
+
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+
+        errorMessage(
+            "registerError",
+            "Enter the 6-digit OTP."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const result =
+            await registerConfirmation.confirm(otp);
+
+        const user =
+            result.user;
+
+
+        const userData = {
+
+            uid: user.uid,
+
+            name: name,
+
+            phone: user.phoneNumber,
+
+            createdAt:
+                serverTimestamp()
+
+        };
+
+
+        await setDoc(
+            doc(
+                db,
+                "users",
+                user.uid
+            ),
+            userData
+        );
+
+
+        await setDoc(
+            doc(
+                db,
+                "phoneUsers",
+                user.phoneNumber
+            ),
+            {
+                uid: user.uid,
+                name: name
+            }
+        );
+
+
+        currentUser =
+            user;
+
+        currentUserData =
+            userData;
+
+
+        showHome();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "registerError",
+            "Invalid OTP. Please try again."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   LOGIN — SEND OTP
+===================================================== */
+
+async function sendLoginOTP() {
+
+    errorMessage(
+        "loginError",
+        ""
+    );
+
+
+    const phone =
+        document
+            .getElementById("loginPhone")
+            .value
+            .trim();
+
+
+    if (!validPhone(phone)) {
+
+        errorMessage(
+            "loginError",
+            "Enter a valid 10-digit mobile number."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const phoneNumber =
+            firebasePhone(phone);
+
+
+        const existing =
+            await getDoc(
+                doc(
+                    db,
+                    "phoneUsers",
+                    phoneNumber
+                )
+            );
+
+
+        if (!existing.exists()) {
+
+            errorMessage(
+                "loginError",
+                "Number not registered. Create an account first."
+            );
+
+            return;
+        }
+
+
+        if (!loginRecaptcha) {
+
+            await setupLoginRecaptcha();
+
+        }
+
+
+        loginConfirmation =
+            await signInWithPhoneNumber(
+                auth,
+                phoneNumber,
+                loginRecaptcha
+            );
+
+
+        document
+            .getElementById("loginOtpBox")
+            .classList
+            .remove("hidden");
+
+
+        errorMessage(
+            "loginError",
+            "OTP sent successfully."
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "loginError",
+            error.message
+        );
+
+        loginRecaptcha = null;
+
+    }
+
+}
+
+
+/* =====================================================
+   LOGIN — VERIFY OTP
+===================================================== */
+
+async function verifyLoginOTP() {
+
+    const otp =
+        document
+            .getElementById("loginOtp")
+            .value
+            .trim();
+
+
+    if (!loginConfirmation) {
+
+        errorMessage(
+            "loginError",
+            "Please request an OTP first."
+        );
+
+        return;
+    }
+
+
+    if (!/^[0-9]{6}$/.test(otp)) {
+
+        errorMessage(
+            "loginError",
+            "Enter the 6-digit OTP."
+        );
+
+        return;
+    }
+
+
+    try {
+
+        const result =
+            await loginConfirmation.confirm(otp);
+
+        currentUser =
+            result.user;
+
+
+        const userDoc =
+            await getDoc(
+                doc(
+                    db,
+                    "users",
+                    currentUser.uid
+                )
+            );
+
+
+        if (!userDoc.exists()) {
+
+            await signOut(auth);
+
+            errorMessage(
+                "loginError",
+                "Account data not found."
+            );
+
+            return;
+        }
+
+
+        currentUserData =
+            userDoc.data();
+
+
+        showHome();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "loginError",
+            "Invalid OTP. Please try again."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   HOME
+===================================================== */
 
 function showHome() {
 
-    if (!currentUser) {
+    if (!currentUserData) {
 
-        showLogin();
+        showPage("loginPage");
 
         return;
     }
 
 
-    hideAllPages();
+    showPage("homePage");
 
 
-    document.getElementById("homePage")
-        .classList.remove("hidden");
-
-
-    document.getElementById("welcomeText")
+    document
+        .getElementById("welcomeText")
         .textContent =
-        "Welcome, " + currentUser.name;
+        "Welcome, " +
+        currentUserData.name +
+        " 👋";
 }
 
 
-/* =========================
-   JOIN CLASS PAGE
-========================= */
+/* =====================================================
+   GENERATE CODE
+===================================================== */
 
-function showJoinClass() {
-
-    hideAllPages();
-
-    document.getElementById("joinPage")
-        .classList.remove("hidden");
-}
-
-
-/* =========================
-   GENERATE CLASS CODE
-========================= */
-
-function generateClassCode() {
+function generateCode() {
 
     const characters =
         "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
     let code = "";
 
-    for (let i = 0; i < 6; i++) {
+    for (
+        let i = 0;
+        i < 6;
+        i++
+    ) {
 
-        code += characters[
-            Math.floor(
-                Math.random() * characters.length
-            )
-        ];
+        code +=
+            characters[
+                Math.floor(
+                    Math.random() *
+                    characters.length
+                )
+            ];
+
     }
 
     return code;
 }
 
 
-/* =========================
-   CREATE CLASS
-   HOST FUNCTION
-========================= */
+/* =====================================================
+   CREATE ROOM
+===================================================== */
 
-function createClass() {
+async function createRoom() {
 
-    if (!currentUser) {
+    const roomName =
+        document
+            .getElementById("roomName")
+            .value
+            .trim();
 
-        alert("Please login first.");
+
+    if (!roomName) {
+
+        errorMessage(
+            "createError",
+            "Enter a room name."
+        );
 
         return;
     }
 
 
-    let code = generateClassCode();
+    try {
+
+        let teacherCode =
+            generateCode();
 
 
-    while (classrooms[code]) {
+        let studentCode =
+            generateCode();
 
-        code = generateClassCode();
+
+        let teacherExists =
+            await getDoc(
+                doc(
+                    db,
+                    "rooms",
+                    teacherCode
+                )
+            );
+
+
+        while (teacherExists.exists()) {
+
+            teacherCode =
+                generateCode();
+
+            teacherExists =
+                await getDoc(
+                    doc(
+                        db,
+                        "rooms",
+                        teacherCode
+                    )
+                );
+
+        }
+
+
+        const room = {
+
+            name: roomName,
+
+            hostUid:
+                currentUser.uid,
+
+            hostName:
+                currentUserData.name,
+
+            teacherCode:
+                teacherCode,
+
+            studentCode:
+                studentCode,
+
+            members: [
+                {
+                    uid:
+                        currentUser.uid,
+
+                    name:
+                        currentUserData.name,
+
+                    role:
+                        "host"
+                }
+            ],
+
+            raisedHands: [],
+
+            questions: [],
+
+            createdAt:
+                serverTimestamp()
+
+        };
+
+
+        await setDoc(
+            doc(
+                db,
+                "rooms",
+                teacherCode
+            ),
+            room
+        );
+
+
+        currentRoomCode =
+            teacherCode;
+
+        isHost = true;
+
+
+        document
+            .getElementById("createdRoomName")
+            .textContent =
+            roomName;
+
+
+        document
+            .getElementById("teacherCode")
+            .textContent =
+            teacherCode;
+
+
+        document
+            .getElementById("studentCode")
+            .textContent =
+            studentCode;
+
+
+        showPage(
+            "roomCreatedPage"
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "createError",
+            error.message
+        );
+
     }
 
-
-    classrooms[code] = {
-
-        hostPhone: currentUser.phone,
-
-        hostName: currentUser.name,
-
-        members: {},
-
-        raisedHands: [],
-
-        questions: []
-
-    };
-
-
-    classrooms[code].members[currentUser.phone] =
-        currentUser.name;
-
-
-    saveClassrooms();
-
-
-    currentClassCode = code;
-
-    isHost = true;
-
-
-    openClassroom();
 }
 
 
-/* =========================
-   JOIN CLASS
-========================= */
+/* =====================================================
+   COPY
+===================================================== */
 
-function joinClass() {
+async function copyText(id) {
+
+    const text =
+        document
+            .getElementById(id)
+            .textContent;
+
+    try {
+
+        await navigator.clipboard.writeText(text);
+
+        alert("Code copied!");
+
+    } catch (error) {
+
+        alert(text);
+
+    }
+
+}
+
+
+/* =====================================================
+   ENTER HOST ROOM
+===================================================== */
+
+function enterHostRoom() {
+
+    openClassroom(
+        currentRoomCode,
+        true
+    );
+
+}
+
+
+/* =====================================================
+   JOIN ROOM
+===================================================== */
+
+async function joinRoom() {
 
     const code =
-        document.getElementById("classCodeInput")
-        .value.trim()
-        .toUpperCase();
+        document
+            .getElementById("roomCodeInput")
+            .value
+            .trim()
+            .toUpperCase();
 
 
-    if (code === "") {
+    if (!code) {
 
-        alert("Please enter the Class Code.");
-
-        return;
-    }
-
-
-    if (!classrooms[code]) {
-
-        alert("Class not found. Check the Class Code.");
+        errorMessage(
+            "joinError",
+            "Enter a room code."
+        );
 
         return;
     }
 
 
-    currentClassCode = code;
+    try {
+
+        /*
+          We check every room document.
+          For the current simple version,
+          the teacher code is the Firebase document ID.
+        */
+
+        const roomDoc =
+            await getDoc(
+                doc(
+                    db,
+                    "rooms",
+                    code
+                )
+            );
 
 
-    const classroom =
-        classrooms[currentClassCode];
+        if (!roomDoc.exists()) {
+
+            errorMessage(
+                "joinError",
+                "Room not found. Check the code."
+            );
+
+            return;
+        }
 
 
-    /* CHECK HOST */
-
-    isHost =
-        classroom.hostPhone === currentUser.phone;
+        const room =
+            roomDoc.data();
 
 
-    /* ADD MEMBER */
-
-    classroom.members[currentUser.phone] =
-        currentUser.name;
+        currentRoomCode =
+            code;
 
 
-    saveClassrooms();
+        isHost =
+            room.hostUid ===
+            currentUser.uid;
 
 
-    document.getElementById("classCodeInput").value = "";
+        const members =
+            room.members || [];
 
 
-    openClassroom();
+        const alreadyMember =
+            members.some(
+                member =>
+                    member.uid ===
+                    currentUser.uid
+            );
+
+
+        if (!alreadyMember) {
+
+            await updateDoc(
+                doc(
+                    db,
+                    "rooms",
+                    code
+                ),
+                {
+                    members:
+                        arrayUnion({
+                            uid:
+                                currentUser.uid,
+
+                            name:
+                                currentUserData.name,
+
+                            role:
+                                "student"
+                        })
+                }
+            );
+
+        }
+
+
+        openClassroom(
+            currentRoomCode,
+            isHost
+        );
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        errorMessage(
+            "joinError",
+            error.message
+        );
+
+    }
+
 }
 
 
-/* =========================
+/* =====================================================
    OPEN CLASSROOM
-========================= */
+===================================================== */
 
-function openClassroom() {
+function openClassroom(
+    roomCode,
+    host
+) {
 
-    hideAllPages();
+    currentRoomCode =
+        roomCode;
 
-
-    document.getElementById("classroomPage")
-        .classList.remove("hidden");
-
-
-    document.getElementById("classCodeDisplay")
-        .textContent =
-        "Class Code: " + currentClassCode;
+    isHost =
+        host;
 
 
-    document.getElementById("studentName")
-        .textContent =
-        currentUser.name;
-
-
-    updateClassroom();
+    showPage(
+        "classroomPage"
+    );
 
 
     if (isHost) {
 
-        document.getElementById("teacherArea")
-            .classList.remove("hidden");
+        document
+            .getElementById("teacherArea")
+            .classList
+            .remove("hidden");
 
     } else {
 
-        document.getElementById("teacherArea")
-            .classList.add("hidden");
+        document
+            .getElementById("teacherArea")
+            .classList
+            .add("hidden");
+
     }
+
+
+    listenToRoom();
+
 }
 
 
-/* =========================
-   UPDATE CLASSROOM
-========================= */
+/* =====================================================
+   FIRESTORE REAL-TIME
+===================================================== */
 
-function updateClassroom() {
+function listenToRoom() {
 
-    if (!currentClassCode) return;
+    if (unsubscribeRoom) {
 
+        unsubscribeRoom();
 
-    const classroom =
-        classrooms[currentClassCode];
-
-
-    if (!classroom) return;
+    }
 
 
-    /* MEMBER COUNT */
-
-    const memberCount =
-        Object.keys(classroom.members).length;
-
-
-    document.getElementById("memberCount")
-        .textContent = memberCount;
-
-
-    /* CHECK CURRENT HAND */
-
-    const alreadyRaised =
-        classroom.raisedHands.some(
-            phone => phone === currentUser.phone
+    const roomRef =
+        doc(
+            db,
+            "rooms",
+            currentRoomCode
         );
 
 
-    const button =
-        document.getElementById("raiseHandButton");
+    unsubscribeRoom =
+        onSnapshot(
+            roomRef,
+            snapshot => {
+
+                if (!snapshot.exists()) {
+
+                    alert(
+                        "This room no longer exists."
+                    );
+
+                    showHome();
+
+                    return;
+                }
+
+
+                renderRoom(
+                    snapshot.data()
+                );
+
+            }
+        );
+
+}
+
+
+/* =====================================================
+   RENDER ROOM
+===================================================== */
+
+function renderRoom(room) {
+
+    document
+        .getElementById("classNameDisplay")
+        .textContent =
+        room.name;
+
+
+    document
+        .getElementById("classCodeDisplay")
+        .textContent =
+        "Room Code: " +
+        currentRoomCode;
+
+
+    document
+        .getElementById("studentName")
+        .textContent =
+        currentUserData.name;
+
+
+    document
+        .getElementById("memberCount")
+        .textContent =
+        (room.members || []).length;
+
+
+    const raisedHands =
+        room.raisedHands || [];
+
+
+    const myHand =
+        raisedHands.some(
+            hand =>
+                hand.uid ===
+                currentUser.uid
+        );
+
+
+    const raiseButton =
+        document
+            .getElementById(
+                "raiseHandButton"
+            );
 
 
     const status =
-        document.getElementById("handStatus");
+        document
+            .getElementById(
+                "handStatus"
+            );
 
 
-    if (alreadyRaised) {
+    if (myHand) {
 
-        button.textContent =
+        raiseButton.textContent =
             "✋ Hand Raised";
 
-        button.classList.add("handRaised");
+        raiseButton.classList.add(
+            "hand-raised"
+        );
 
         status.textContent =
             "Your hand is raised.";
 
     } else {
 
-        button.textContent =
+        raiseButton.textContent =
             "✋ Raise Hand";
 
-        button.classList.remove("handRaised");
-
-        status.textContent = "";
-    }
-
-
-    /* UPDATE TEACHER RANKING */
-
-    updateRanking();
-
-
-    /* UPDATE QUESTIONS */
-
-    updateQuestions();
-}
-
-
-/* =========================
-   RAISE HAND
-========================= */
-
-function raiseHand() {
-
-    if (!currentClassCode) {
-
-        alert("You are not inside a classroom.");
-
-        return;
-    }
-
-
-    const classroom =
-        classrooms[currentClassCode];
-
-
-    if (!classroom) return;
-
-
-    /* PREVENT DUPLICATE */
-
-    if (
-        classroom.raisedHands.includes(
-            currentUser.phone
-        )
-    ) {
-
-        return;
-    }
-
-
-    /* ADD PHONE INTERNALLY */
-
-    classroom.raisedHands.push(
-        currentUser.phone
-    );
-
-
-    saveClassrooms();
-
-
-    updateClassroom();
-}
-
-
-/* =========================
-   UPDATE RANKING
-========================= */
-
-function updateRanking() {
-
-    if (!isHost) return;
-
-
-    const list =
-        document.getElementById("rankingList");
-
-
-    const classroom =
-        classrooms[currentClassCode];
-
-
-    if (
-        !classroom ||
-        classroom.raisedHands.length === 0
-    ) {
-
-        list.innerHTML = `
-            <p class="emptyMessage">
-                No students have raised their hands.
-            </p>
-        `;
-
-        return;
-    }
-
-
-    list.innerHTML = "";
-
-
-    classroom.raisedHands.forEach(
-        (phone, index) => {
-
-            const name =
-                classroom.members[phone] ||
-                registeredUsers[phone]?.name ||
-                "Unknown";
-
-
-            const item =
-                document.createElement("div");
-
-            item.className = "rankingItem";
-
-
-            item.innerHTML = `
-                <div class="rankNumber">
-                    ${index + 1}
-                </div>
-
-                <div class="studentRankName">
-                    ${escapeHTML(name)}
-                </div>
-            `;
-
-
-            list.appendChild(item);
-        }
-    );
-}
-
-
-/* =========================
-   RESET RAISED HANDS
-========================= */
-
-function resetRaisedHands() {
-
-    if (!isHost) {
-
-        alert(
-            "Only the host can reset raised hands."
+        raiseButton.classList.remove(
+            "hand-raised"
         );
 
-        return;
+        status.textContent = "";
+
     }
 
 
-    const classroom =
-        classrooms[currentClassCode];
+    renderRanking(
+        raisedHands
+    );
 
 
-    if (!classroom) return;
+    renderQuestions(
+        room.questions || []
+    );
 
-
-    classroom.raisedHands = [];
-
-
-    saveClassrooms();
-
-
-    updateClassroom();
 }
 
 
-/* =========================
-   ASK QUESTION
-========================= */
+/* =====================================================
+   RAISE HAND
+===================================================== */
 
-function askQuestion() {
+async function raiseHand() {
 
-    const input =
-        document.getElementById("questionInput");
-
-
-    const question =
-        input.value.trim();
+    if (!currentRoomCode) return;
 
 
-    if (question === "") {
+    try {
 
-        alert("Please enter a question.");
-
-        return;
-    }
-
-
-    const classroom =
-        classrooms[currentClassCode];
+        const roomRef =
+            doc(
+                db,
+                "rooms",
+                currentRoomCode
+            );
 
 
-    if (!classroom) return;
-
-
-    classroom.questions.push({
-
-        name: currentUser.name,
-
-        question: question
-
-    });
-
-
-    saveClassrooms();
-
-
-    input.value = "";
-
-
-    updateQuestions();
-}
-
-
-/* =========================
-   DISPLAY QUESTIONS
-========================= */
-
-function updateQuestions() {
-
-    const list =
-        document.getElementById("questionList");
-
-
-    const classroom =
-        classrooms[currentClassCode];
-
-
-    if (!classroom) return;
-
-
-    list.innerHTML = "";
-
-
-    classroom.questions.forEach(
-        item => {
-
-            const div =
-                document.createElement("div");
-
-            div.className =
-                "questionItem";
-
-
-            div.innerHTML = `
-                <div class="questionName">
-                    ${escapeHTML(item.name)}
-                </div
+        const roomDoc =
+            await getDoc(
+                roomRef
+            );
