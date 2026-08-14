@@ -1,4 +1,4 @@
-/* =====================================================
+====================================================
    RAISE HAND CLASSROOM
 ===================================================== */
 
@@ -710,90 +710,4 @@ function updateQuestions() {
             div.innerHTML = `
                 <div class="questionName">
                     ${escapeHTML(item.name)}
-                </div>
-
-                <div class="questionText">
-                    ${escapeHTML(item.question)}
-                </div>
-            `;
-
-
-            list.appendChild(div);
-        }
-    );
-}
-
-
-/* =========================
-   SAVE CLASSROOMS
-========================= */
-
-function saveClassrooms() {
-
-    localStorage.setItem(
-        "classrooms",
-        JSON.stringify(classrooms)
-    );
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-function logout() {
-
-    currentUser = null;
-    currentClassCode = null;
-    isHost = false;
-
-    localStorage.removeItem("currentUser");
-
-    showLogin();
-}
-
-
-/* =========================
-   SECURITY / HTML ESCAPE
-========================= */
-
-function escapeHTML(text) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = text;
-
-    return div.innerHTML;
-}
-
-
-/* =========================
-   CHECK PREVIOUS LOGIN
-========================= */
-
-function checkPreviousLogin() {
-
-    const savedUser =
-        localStorage.getItem("currentUser");
-
-
-    if (savedUser) {
-
-        currentUser =
-            JSON.parse(savedUser);
-
-        showHome();
-
-    } else {
-
-        showRegister();
-    }
-}
-
-
-/* =========================
-   START WEBSITE
-========================= */
-
-checkPreviousLogin();
+                </div
