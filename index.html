@@ -1,11 +1,9 @@
-
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Raise First</title>
 
@@ -14,177 +12,138 @@
 
 <body>
 
-    <!-- =====================================================
-         PAGE 1 — LOGIN
-    ====================================================== -->
-
+    <!-- LOGIN -->
     <main id="loginPage" class="page">
-
-        <div class="container">
+        <div class="card">
 
             <h1>🙋 Raise First</h1>
-
-            <p class="tagline">
-                Raise your hand first.
-            </p>
+            <p>Raise your hand first.</p>
 
             <h2>Login</h2>
 
-            <input
-                type="text"
-                id="loginUsername"
-                placeholder="Username or Email"
-                autocomplete="username"
-            >
+            <input id="loginPhone"
+                   type="tel"
+                   placeholder="10-digit mobile number"
+                   maxlength="10">
 
-            <input
-                type="password"
-                id="loginPassword"
-                placeholder="Password"
-                autocomplete="current-password"
-            >
+            <div id="loginRecaptcha"></div>
 
-            <button
-                id="loginBtn"
-                class="primary-btn">
-                Login
+            <button id="sendLoginOtpBtn">
+                Send OTP
             </button>
 
-            <p id="loginError"
-               class="error-message"></p>
+            <input id="loginOtp"
+                   class="hidden"
+                   type="text"
+                   placeholder="Enter OTP"
+                   maxlength="6">
 
-            <p class="signup-text">
+            <button id="verifyLoginOtpBtn"
+                    class="hidden">
+                Verify OTP
+            </button>
+
+            <p id="loginError" class="error-message"></p>
+
+            <p class="switchText">
                 Don't have an account?
+                <span onclick="showPage('registerPage')">
+                    Sign Up
+                </span>
             </p>
 
-            <button
-                id="signupBtn"
-                class="link-btn">
-                Sign Up
-            </button>
-
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         SIGN UP PAGE
-    ====================================================== -->
+    <!-- REGISTER -->
+    <main id="registerPage" class="page hidden">
+        <div class="card">
 
-    <main id="signupPage" class="page hidden">
-
-        <div class="container">
-
-            <button
-                class="back-btn"
-                onclick="showPage('loginPage')">
-                ← Back
-            </button>
+            <h1>🙋 Raise First</h1>
 
             <h2>Create Account</h2>
 
-            <input
-                type="text"
-                id="signupName"
-                placeholder="Enter your name"
-                maxlength="50"
-            >
+            <input id="registerName"
+                   type="text"
+                   placeholder="Enter your name"
+                   maxlength="50">
 
-            <input
-                type="email"
-                id="signupEmail"
-                placeholder="Enter email"
-                autocomplete="email"
-            >
+            <input id="registerPhone"
+                   type="tel"
+                   placeholder="10-digit mobile number"
+                   maxlength="10">
 
-            <input
-                type="password"
-                id="signupPassword"
-                placeholder="Create password"
-                autocomplete="new-password"
-            >
+            <div id="registerRecaptcha"></div>
 
-            <button
-                id="createAccountBtn"
-                class="primary-btn">
-                Create Account
+            <button id="sendRegisterOtpBtn">
+                Send OTP
             </button>
 
-            <p id="signupError"
-               class="error-message"></p>
+            <input id="registerOtp"
+                   class="hidden"
+                   type="text"
+                   placeholder="Enter OTP"
+                   maxlength="6">
 
-        </div>
+            <button id="verifyRegisterOtpBtn"
+                    class="hidden">
+                Verify & Register
+            </button>
 
-    </main>
+            <p id="registerError" class="error-message"></p>
 
-
-    <!-- =====================================================
-         PAGE 2 — MAIN MENU
-    ====================================================== -->
-
-    <main id="mainPage" class="page hidden">
-
-        <div class="container">
-
-            <h2>Welcome 👋</h2>
-
-            <p>
-                What do you want to do?
+            <p class="switchText">
+                Already have an account?
+                <span onclick="showPage('loginPage')">
+                    Login
+                </span>
             </p>
 
-            <div class="menu-buttons">
-
-                <button
-                    id="createRoomBtn"
-                    class="primary-btn">
-                    ➕ Create Room
-                </button>
-
-                <button
-                    id="joinRoomBtn"
-                    class="secondary-btn">
-                    🔑 Join Using Code
-                </button>
-
-            </div>
-
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         CREATE ROOM — STEP 1
-    ====================================================== -->
+    <!-- HOME -->
+    <main id="homePage" class="page hidden">
+        <div class="card">
 
+            <h2 id="welcomeText">Welcome 👋</h2>
+
+            <button id="createRoomBtn">
+                ➕ Create Room
+            </button>
+
+            <button id="joinRoomBtn">
+                🔑 Join Using Code
+            </button>
+
+            <button class="secondary"
+                    onclick="logout()">
+                Logout
+            </button>
+
+        </div>
+    </main>
+
+
+    <!-- CREATE ROOM -->
     <main id="createRoomPage" class="page hidden">
+        <div class="card">
 
-        <div class="container">
-
-            <button
-                class="back-btn"
-                onclick="showPage('mainPage')">
+            <button class="secondary"
+                    onclick="showPage('homePage')">
                 ← Back
             </button>
 
             <h2>Create Room</h2>
 
-            <p>
-                Enter a name for your room.
-            </p>
+            <input id="roomName"
+                   type="text"
+                   placeholder="Enter room name"
+                   maxlength="50">
 
-            <input
-                type="text"
-                id="roomName"
-                placeholder="Enter room name"
-                maxlength="50"
-                autocomplete="off"
-            >
-
-            <button
-                id="continueCreateBtn"
-                class="primary-btn">
+            <button id="continueCreateBtn">
                 Continue
             </button>
 
@@ -192,204 +151,84 @@
                class="error-message"></p>
 
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         CREATE ROOM — STEP 2
-         QUESTION MODE
-    ====================================================== -->
-
-    <main id="questionModePage"
-          class="page hidden">
-
-        <div class="container">
-
-            <button
-                class="back-btn"
-                onclick="showPage('createRoomPage')">
-                ← Back
-            </button>
+    <!-- QUESTION MODE -->
+    <main id="questionModePage" class="page hidden">
+        <div class="card">
 
             <h2>Question Mode</h2>
 
-            <p>
-                How will you ask questions?
-            </p>
+            <p>How will you ask questions?</p>
 
-            <button
-                id="websiteQuestionBtn"
-                class="mode-btn">
-
-                <span class="mode-icon">📝</span>
-
-                <span>
-                    <strong>
-                        Ask Questions in Website
-                    </strong>
-
-                    <small>
-                        Questions appear on
-                        members' screens.
-                    </small>
-                </span>
-
+            <button id="websiteQuestionBtn">
+                📝 Ask Questions in Website
             </button>
 
-
-            <button
-                id="manualQuestionBtn"
-                class="mode-btn">
-
-                <span class="mode-icon">🗣️</span>
-
-                <span>
-                    <strong>
-                        Ask Questions Manually
-                    </strong>
-
-                    <small>
-                        Ask questions verbally.
-                    </small>
-                </span>
-
+            <button id="manualQuestionBtn">
+                🗣️ Ask Questions Manually
             </button>
 
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         ROOM CREATED PAGE
-    ====================================================== -->
-
-    <main id="roomCreatedPage"
-          class="page hidden">
-
-        <div class="container">
+    <!-- ROOM CREATED -->
+    <main id="roomCreatedPage" class="page hidden">
+        <div class="card">
 
             <h2>🎉 Room Created</h2>
 
-            <p class="room-created-text">
-                Share the appropriate code
-                with other members.
-            </p>
+            <p>Room Name</p>
 
-
-            <div class="created-room-name">
-
-                <span>Room Name</span>
-
-                <strong id="createdRoomName">
-                    Room
-                </strong>
-
-            </div>
-
-
-            <!-- TEACHER CODE -->
+            <strong id="createdRoomName">
+                Room
+            </strong>
 
             <div class="code-card">
+                <p>👨‍🏫 Teacher Code</p>
+                <strong id="teacherCode">------</strong>
 
-                <p>
-                    👨‍🏫 Teacher Code
-                </p>
-
-                <strong id="teacherCode">
-                    --------
-                </strong>
-
-                <button
-                    onclick="copyCode('teacherCode')"
-                    class="copy-btn">
+                <button onclick="copyCode('teacherCode')">
                     Copy
                 </button>
-
             </div>
-
-
-            <!-- STUDENT CODE -->
 
             <div class="code-card">
+                <p>👨‍🎓 Student Code</p>
+                <strong id="studentCode">------</strong>
 
-                <p>
-                    👨‍🎓 Student Code
-                </p>
-
-                <strong id="studentCode">
-                    --------
-                </strong>
-
-                <button
-                    onclick="copyCode('studentCode')"
-                    class="copy-btn">
+                <button onclick="copyCode('studentCode')">
                     Copy
                 </button>
-
             </div>
 
-
-            <div class="room-limit-info">
-
-                <p>
-                    👨‍🏫 Host + Teachers:
-                    <strong>0 / 50</strong>
-                </p>
-
-                <p>
-                    👨‍🎓 Students:
-                    <strong>0 / 300</strong>
-                </p>
-
-            </div>
-
-
-            <button
-                id="enterHostRoomBtn"
-                class="primary-btn">
+            <button id="enterHostRoomBtn">
                 Enter Room
             </button>
 
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         JOIN ROOM PAGE
-    ====================================================== -->
+    <!-- JOIN ROOM -->
+    <main id="joinPage" class="page hidden">
+        <div class="card">
 
-    <main id="joinPage"
-          class="page hidden">
-
-        <div class="container">
-
-            <button
-                class="back-btn"
-                onclick="showPage('mainPage')">
+            <button class="secondary"
+                    onclick="showPage('homePage')">
                 ← Back
             </button>
 
             <h2>🔑 Join Room</h2>
 
-            <p>
-                Enter the code given by
-                the Host.
-            </p>
+            <input id="classCodeInput"
+                   type="text"
+                   placeholder="Enter room code"
+                   maxlength="20">
 
-            <input
-                type="text"
-                id="roomCodeInput"
-                placeholder="Enter room code"
-                maxlength="20"
-                autocomplete="off"
-            >
-
-            <button
-                id="continueJoinBtn"
-                class="primary-btn">
+            <button id="continueJoinBtn">
                 Join
             </button>
 
@@ -397,74 +236,101 @@
                class="error-message"></p>
 
         </div>
-
     </main>
 
 
-    <!-- =====================================================
-         STUDENT DETAILS
-    ====================================================== -->
+    <!-- CLASSROOM -->
+    <main id="classroomPage"
+         class="page hidden">
 
-    <main id="studentDetailsPage"
-          class="page hidden">
+        <header class="classHeader">
 
-        <div class="container">
+            <div>
+                <h2 id="classNameDisplay">
+                    Classroom
+                </h2>
 
-            <h2>👨‍🎓 Student Details</h2>
+                <p id="classCodeDisplay"></p>
+            </div>
 
-            <p>
-                Enter your details to join.
-            </p>
+            <div class="memberCountCircle">
+                <span id="memberCount">0</span>
+            </div>
 
-            <input
-                type="text"
-                id="studentName"
-                placeholder="Your name"
-                maxlength="50"
-            >
+        </header>
 
-            <input
-                type="text"
-                id="rollNumber"
-                placeholder="Roll number"
-                maxlength="30"
-            >
 
-            <button
-                id="joinAsStudentBtn"
-                class="primary-btn">
-                Join Room
-            </button>
+        <div class="classroomContent">
 
-            <p id="studentError"
-               class="error-message"></p>
+            <!-- STUDENT AREA -->
+            <section class="studentArea">
+
+                <h2>
+                    Welcome,
+                    <span id="studentName"></span>
+                </h2>
+
+                <button id="raiseHandButton"
+                        class="raiseButton">
+                    ✋ Raise Hand
+                </button>
+
+                <p id="handStatus"></p>
+
+            </section>
+
+
+            <!-- TEACHER AREA -->
+            <section id="teacherArea"
+                     class="teacherArea hidden">
+
+                <h2>🏆 Raised Hands</h2>
+
+                <p class="smallText">
+                    First person is shown at the top.
+                </p>
+
+                <div id="rankingList"
+                     class="rankingList">
+                </div>
+
+                <button id="resetHandsButton"
+                        class="resetButton">
+                    🔄 Reset Raised Hands
+                </button>
+
+            </section>
+
+
+            <!-- QUESTIONS -->
+            <section id="questionArea"
+                     class="questionArea">
+
+                <h3>❓ Questions</h3>
+
+                <div id="studentQuestionBox">
+
+                    <input id="questionInput"
+                           type="text"
+                           placeholder="Enter your question">
+
+                    <button id="askQuestionBtn">
+                        Ask Question
+                    </button>
+
+                </div>
+
+                <div id="questionList"></div>
+
+            </section>
 
         </div>
 
     </main>
 
 
-    <!-- =====================================================
-         TEACHER DETAILS
-    ====================================================== -->
+    <!-- FIREBASE -->
+    <script type="module" src="script.js"></script>
 
-    <main id="teacherDetailsPage"
-          class="page hidden">
-
-        <div class="container">
-
-            <h2>👨‍🏫 Teacher Details</h2>
-
-            <p>
-                Enter your name to join.
-            </p>
-
-            <input
-                type="text"
-                id="teacherName"
-                placeholder="Your name"
-                maxlength="50"
-            >
-
-            <button
-                id="joinAsTeacherBtn
+</body>
+</html>
