@@ -1,5 +1,10 @@
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+/* =====================================================
+   FIREBASE IMPORTS
+===================================================== */
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
 
 import {
     getAuth,
@@ -7,8 +12,7 @@ import {
     signInWithPhoneNumber,
     signOut,
     onAuthStateChanged
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 import {
     getFirestore,
@@ -19,32 +23,33 @@ import {
     onSnapshot,
     arrayUnion,
     serverTimestamp
-}
-from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 
 /* =====================================================
-   🔥 PASTE YOUR FIREBASE CONFIG HERE
+   FIREBASE CONFIG — AGNI
 ===================================================== */
 
 const firebaseConfig = {
 
-    apiKey: "PASTE_YOUR_API_KEY",
+    apiKey: "AIzaSyA14EEPgj71NrbHo_yLmgPZdgfVeCVBkfQ",
 
-    authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+    authDomain: "agni-572a5.firebaseapp.com",
 
-    projectId: "PASTE_YOUR_PROJECT_ID",
+    projectId: "agni-572a5",
 
-    storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
+    storageBucket: "agni-572a5.firebasestorage.app",
 
-    messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
+    messagingSenderId: "302971641868",
 
-    appId: "PASTE_YOUR_APP_ID"
+    appId: "1:302971641868:web:ed91fa94d2e939bc114e29",
+
+    measurementId: "G-G2H5WZ8NVH"
 };
 
 
 /* =====================================================
-   FIREBASE
+   INITIALIZE FIREBASE
 ===================================================== */
 
 const app = initializeApp(firebaseConfig);
@@ -59,22 +64,26 @@ const db = getFirestore(app);
 ===================================================== */
 
 let currentUser = null;
+
 let currentUserData = null;
 
 let currentRoomCode = null;
+
 let isHost = false;
 
 let loginConfirmation = null;
+
 let registerConfirmation = null;
 
 let loginRecaptcha = null;
+
 let registerRecaptcha = null;
 
 let unsubscribeRoom = null;
 
 
 /* =====================================================
-   PAGE
+   PAGE CONTROL
 ===================================================== */
 
 function showPage(id) {
@@ -82,19 +91,24 @@ function showPage(id) {
     document
         .querySelectorAll(".page, .classroom-page")
         .forEach(page => {
+
             page.classList.add("hidden");
+
         });
 
-    const page = document.getElementById(id);
+    const page =
+        document.getElementById(id);
 
     if (page) {
+
         page.classList.remove("hidden");
+
     }
 }
 
 
 /* =====================================================
-   ERROR
+   ERROR MESSAGE
 ===================================================== */
 
 function showError(id, message) {
@@ -103,23 +117,69 @@ function showError(id, message) {
         document.getElementById(id);
 
     if (element) {
+
         element.textContent = message;
+
     }
 }
 
 
 /* =====================================================
-   PHONE
+   FIREBASE ERROR
+===================================================== */
+
+function getFirebaseError(error) {
+
+    const code = error?.code || "";
+
+    const messages = {
+
+        "auth/invalid-phone-number":
+            "Invalid phone number.",
+
+        "auth/too-many-requests":
+            "Too many attempts. Please try again later.",
+
+        "auth/invalid-verification-code":
+            "Invalid OTP.",
+
+        "auth/code-expired":
+            "OTP expired. Please request a new OTP.",
+
+        "auth/quota-exceeded":
+            "SMS quota exceeded. Please try again later.",
+
+        "auth/network-request-failed":
+            "Network error. Check your internet connection.",
+
+        "auth/operation-not-allowed":
+            "Phone authentication is not enabled in Firebase.",
+
+        "auth/captcha-check-failed":
+            "reCAPTCHA verification failed."
+    };
+
+    return messages[code] ||
+        error?.message ||
+        "Something went wrong.";
+}
+
+
+/* =====================================================
+   PHONE VALIDATION
 ===================================================== */
 
 function validPhone(phone) {
 
     return /^[0-9]{10}$/.test(phone);
+
 }
+
 
 function firebasePhone(phone) {
 
     return "+91" + phone;
+
 }
 
 
@@ -130,9 +190,13 @@ function firebasePhone(phone) {
 async function setupLoginRecaptcha() {
 
     if (loginRecaptcha) {
+
         try {
+
             loginRecaptcha.clear();
+
         } catch (e) {}
+
     }
 
     loginRecaptcha =
@@ -147,6 +211,7 @@ async function setupLoginRecaptcha() {
     await loginRecaptcha.render();
 
     return loginRecaptcha;
+
 }
 
 
@@ -157,9 +222,13 @@ async function setupLoginRecaptcha() {
 async function setupRegisterRecaptcha() {
 
     if (registerRecaptcha) {
+
         try {
+
             registerRecaptcha.clear();
+
         } catch (e) {}
+
     }
 
     registerRecaptcha =
@@ -174,6 +243,7 @@ async function setupRegisterRecaptcha() {
     await registerRecaptcha.render();
 
     return registerRecaptcha;
+
 }
 
 
@@ -183,33 +253,40 @@ async function setupRegisterRecaptcha() {
 
 async function sendRegisterOTP() {
 
-    showError("registerError", "");
+    showError(
+        "registerError",
+        ""
+    );
 
     const name =
         document
             .getElementById("registerName")
-            .value
+            ?.value
             .trim();
 
     const phone =
         document
             .getElementById("registerPhone")
-            .value
+            ?.value
             .trim();
 
     if (!name) {
+
         showError(
             "registerError",
             "Please enter your name."
         );
+
         return;
     }
 
     if (!validPhone(phone)) {
+
         showError(
             "registerError",
             "Enter a valid 10-digit mobile number."
         );
+
         return;
     }
 
@@ -248,7 +325,7 @@ async function sendRegisterOTP() {
 
         document
             .getElementById("registerOtpBox")
-            .classList
+            ?.classList
             .remove("hidden");
 
         showError(
@@ -265,8 +342,8 @@ async function sendRegisterOTP() {
             getFirebaseError(error)
         );
 
-        registerRecaptcha = null;
     }
+
 }
 
 
@@ -279,13 +356,13 @@ async function verifyRegisterOTP() {
     const name =
         document
             .getElementById("registerName")
-            .value
+            ?.value
             .trim();
 
     const otp =
         document
             .getElementById("registerOtp")
-            .value
+            ?.value
             .trim();
 
     if (!registerConfirmation) {
@@ -325,6 +402,7 @@ async function verifyRegisterOTP() {
             phone: user.phoneNumber,
 
             createdAt: serverTimestamp()
+
         };
 
         await setDoc(
@@ -348,9 +426,11 @@ async function verifyRegisterOTP() {
             }
         );
 
-        currentUser = user;
+        currentUser =
+            user;
 
-        currentUserData = userData;
+        currentUserData =
+            userData;
 
         showHome();
 
@@ -360,9 +440,11 @@ async function verifyRegisterOTP() {
 
         showError(
             "registerError",
-            "Invalid OTP. Please try again."
+            getFirebaseError(error)
         );
+
     }
+
 }
 
 
@@ -372,12 +454,15 @@ async function verifyRegisterOTP() {
 
 async function sendLoginOTP() {
 
-    showError("loginError", "");
+    showError(
+        "loginError",
+        ""
+    );
 
     const phone =
         document
             .getElementById("loginPhone")
-            .value
+            ?.value
             .trim();
 
     if (!validPhone(phone)) {
@@ -425,7 +510,7 @@ async function sendLoginOTP() {
 
         document
             .getElementById("loginOtpBox")
-            .classList
+            ?.classList
             .remove("hidden");
 
         showError(
@@ -442,8 +527,8 @@ async function sendLoginOTP() {
             getFirebaseError(error)
         );
 
-        loginRecaptcha = null;
     }
+
 }
 
 
@@ -456,7 +541,7 @@ async function verifyLoginOTP() {
     const otp =
         document
             .getElementById("loginOtp")
-            .value
+            ?.value
             .trim();
 
     if (!loginConfirmation) {
@@ -519,9 +604,11 @@ async function verifyLoginOTP() {
 
         showError(
             "loginError",
-            "Invalid OTP. Please try again."
+            getFirebaseError(error)
         );
+
     }
+
 }
 
 
@@ -540,17 +627,25 @@ function showHome() {
 
     showPage("homePage");
 
-    document
-        .getElementById("welcomeText")
-        .textContent =
-        "Welcome, " +
-        currentUserData.name +
-        " 👋";
+    const welcome =
+        document.getElementById(
+            "welcomeText"
+        );
+
+    if (welcome) {
+
+        welcome.textContent =
+            "Welcome, " +
+            currentUserData.name +
+            " 👋";
+
+    }
+
 }
 
 
 /* =====================================================
-   CREATE ROOM
+   ROOM CODE
 ===================================================== */
 
 function generateCode() {
@@ -569,18 +664,24 @@ function generateCode() {
                     characters.length
                 )
             ];
+
     }
 
     return code;
+
 }
 
+
+/* =====================================================
+   CREATE ROOM
+===================================================== */
 
 async function createRoom() {
 
     const roomName =
         document
             .getElementById("roomName")
-            .value
+            ?.value
             .trim();
 
     if (!roomName) {
@@ -588,6 +689,16 @@ async function createRoom() {
         showError(
             "createError",
             "Enter a room name."
+        );
+
+        return;
+    }
+
+    if (!currentUser) {
+
+        showError(
+            "createError",
+            "Please login first."
         );
 
         return;
@@ -601,8 +712,14 @@ async function createRoom() {
         let studentCode =
             generateCode();
 
-        while (studentCode === teacherCode) {
-            studentCode = generateCode();
+        while (
+            studentCode ===
+            teacherCode
+        ) {
+
+            studentCode =
+                generateCode();
+
         }
 
         let roomDoc =
@@ -616,7 +733,8 @@ async function createRoom() {
 
         while (roomDoc.exists()) {
 
-            teacherCode = generateCode();
+            teacherCode =
+                generateCode();
 
             roomDoc =
                 await getDoc(
@@ -626,6 +744,7 @@ async function createRoom() {
                         teacherCode
                     )
                 );
+
         }
 
         const room = {
@@ -645,6 +764,7 @@ async function createRoom() {
                 studentCode,
 
             members: [
+
                 {
                     uid:
                         currentUser.uid,
@@ -655,6 +775,7 @@ async function createRoom() {
                     role:
                         "host"
                 }
+
             ],
 
             raisedHands: [],
@@ -663,6 +784,7 @@ async function createRoom() {
 
             createdAt:
                 serverTimestamp()
+
         };
 
         await setDoc(
@@ -679,22 +801,45 @@ async function createRoom() {
 
         isHost = true;
 
-        document
-            .getElementById("createdRoomName")
-            .textContent =
-            roomName;
+        const createdName =
+            document.getElementById(
+                "createdRoomName"
+            );
 
-        document
-            .getElementById("teacherCode")
-            .textContent =
-            teacherCode;
+        if (createdName) {
 
-        document
-            .getElementById("studentCode")
-            .textContent =
-            studentCode;
+            createdName.textContent =
+                roomName;
 
-        showPage("roomCreatedPage");
+        }
+
+        const teacher =
+            document.getElementById(
+                "teacherCode"
+            );
+
+        if (teacher) {
+
+            teacher.textContent =
+                teacherCode;
+
+        }
+
+        const student =
+            document.getElementById(
+                "studentCode"
+            );
+
+        if (student) {
+
+            student.textContent =
+                studentCode;
+
+        }
+
+        showPage(
+            "roomCreatedPage"
+        );
 
     } catch (error) {
 
@@ -704,31 +849,40 @@ async function createRoom() {
             "createError",
             getFirebaseError(error)
         );
+
     }
+
 }
 
 
 /* =====================================================
-   COPY
+   COPY CODE
 ===================================================== */
 
 async function copyText(id) {
 
+    const element =
+        document.getElementById(id);
+
+    if (!element) return;
+
     const text =
-        document
-            .getElementById(id)
-            .textContent;
+        element.textContent;
 
     try {
 
-        await navigator.clipboard.writeText(text);
+        await navigator.clipboard.writeText(
+            text
+        );
 
         alert("Code copied!");
 
     } catch (error) {
 
         alert(text);
+
     }
+
 }
 
 
@@ -740,8 +894,10 @@ async function joinRoom() {
 
     const code =
         document
-            .getElementById("roomCodeInput")
-            .value
+            .getElementById(
+                "roomCodeInput"
+            )
+            ?.value
             .trim()
             .toUpperCase();
 
@@ -755,16 +911,33 @@ async function joinRoom() {
         return;
     }
 
+    if (!currentUser) {
+
+        showError(
+            "joinError",
+            "Please login first."
+        );
+
+        return;
+    }
+
     try {
 
-        const roomDoc =
+        let roomCode = code;
+
+        let roomDoc =
             await getDoc(
                 doc(
                     db,
                     "rooms",
-                    code
+                    roomCode
                 )
             );
+
+        /*
+           If student enters student code,
+           find the room by searching room documents.
+        */
 
         if (!roomDoc.exists()) {
 
@@ -780,15 +953,21 @@ async function joinRoom() {
             roomDoc.data();
 
         currentRoomCode =
-            code;
+            roomCode;
 
-        if (code === room.teacherCode) {
+        if (
+            code ===
+            room.teacherCode
+        ) {
 
             isHost =
                 room.hostUid ===
                 currentUser.uid;
 
-        } else if (code === room.studentCode) {
+        } else if (
+            code ===
+            room.studentCode
+        ) {
 
             isHost = false;
 
@@ -818,11 +997,12 @@ async function joinRoom() {
                 doc(
                     db,
                     "rooms",
-                    code
+                    currentRoomCode
                 ),
                 {
                     members:
                         arrayUnion({
+
                             uid:
                                 currentUser.uid,
 
@@ -833,9 +1013,11 @@ async function joinRoom() {
                                 isHost
                                     ? "host"
                                     : "student"
+
                         })
                 }
             );
+
         }
 
         openClassroom(
@@ -851,7 +1033,9 @@ async function joinRoom() {
             "joinError",
             getFirebaseError(error)
         );
+
     }
+
 }
 
 
@@ -870,26 +1054,42 @@ function openClassroom(
     isHost =
         host;
 
-    showPage("classroomPage");
+    showPage(
+        "classroomPage"
+    );
 
-    document
-        .getElementById("teacherArea")
-        .classList
-        .toggle("hidden", !isHost);
+    const teacherArea =
+        document.getElementById(
+            "teacherArea"
+        );
+
+    if (teacherArea) {
+
+        teacherArea.classList.toggle(
+            "hidden",
+            !isHost
+        );
+
+    }
 
     listenToRoom();
+
 }
 
 
 /* =====================================================
-   REAL TIME ROOM
+   REAL-TIME ROOM LISTENER
 ===================================================== */
 
 function listenToRoom() {
 
     if (unsubscribeRoom) {
+
         unsubscribeRoom();
+
     }
+
+    if (!currentRoomCode) return;
 
     const roomRef =
         doc(
@@ -909,159 +1109,15 @@ function listenToRoom() {
                         "Room no longer exists."
                     );
 
+                    currentRoomCode =
+                        null;
+
+                    isHost = false;
+
                     showHome();
 
                     return;
                 }
 
                 renderRoom(
-                    snapshot.data()
-                );
-            },
-            error => {
-
-                console.error(error);
-
-                alert(
-                    "Unable to read classroom."
-                );
-            }
-        );
-}
-
-
-/* =====================================================
-   RENDER ROOM
-===================================================== */
-
-function renderRoom(room) {
-
-    document
-        .getElementById("classNameDisplay")
-        .textContent =
-        room.name;
-
-    document
-        .getElementById("classCodeDisplay")
-        .textContent =
-        "Room Code: " +
-        currentRoomCode;
-
-    document
-        .getElementById("studentName")
-        .textContent =
-        currentUserData.name;
-
-    document
-        .getElementById("memberCount")
-        .textContent =
-        (room.members || []).length;
-
-    const raisedHands =
-        room.raisedHands || [];
-
-    const myHand =
-        raisedHands.some(
-            hand =>
-                hand.uid ===
-                currentUser.uid
-        );
-
-    const button =
-        document.getElementById(
-            "raiseHandButton"
-        );
-
-    const status =
-        document.getElementById(
-            "handStatus"
-        );
-
-    if (myHand) {
-
-        button.textContent =
-            "✋ Hand Raised";
-
-        button.classList.add(
-            "handRaised"
-        );
-
-        status.textContent =
-            "Your hand is raised.";
-
-    } else {
-
-        button.textContent =
-            "✋ Raise Hand";
-
-        button.classList.remove(
-            "handRaised"
-        );
-
-        status.textContent = "";
-    }
-
-    renderRanking(
-        raisedHands,
-        room.members || []
-    );
-
-    renderQuestions(
-        room.questions || []
-    );
-}
-
-
-/* =====================================================
-   RAISE HAND
-===================================================== */
-
-async function raiseHand() {
-
-    if (!currentRoomCode) return;
-
-    try {
-
-        const roomRef =
-            doc(
-                db,
-                "rooms",
-                currentRoomCode
-            );
-
-        const roomDoc =
-            await getDoc(roomRef);
-
-        if (!roomDoc.exists()) return;
-
-        const room =
-            roomDoc.data();
-
-        const raisedHands =
-            room.raisedHands || [];
-
-        const alreadyRaised =
-            raisedHands.some(
-                hand =>
-                    hand.uid ===
-                    currentUser.uid
-            );
-
-        if (alreadyRaised) return;
-
-        const hand = {
-
-            uid:
-                currentUser.uid,
-
-            name:
-                currentUserData.name,
-
-            raisedAt:
-                Date.now()
-        };
-
-        await updateDoc(
-            roomRef,
-            {
-                raised
+                    
