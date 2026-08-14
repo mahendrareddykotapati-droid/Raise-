@@ -22,6 +22,10 @@ import {
     updateDoc,
     onSnapshot,
     arrayUnion,
+    collection,
+    query,
+    where,
+    getDocs,
     serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
@@ -60,7 +64,7 @@ const db = getFirestore(app);
 
 
 /* =====================================================
-   VARIABLES
+   GLOBAL VARIABLES
 ===================================================== */
 
 let currentUser = null;
@@ -83,7 +87,7 @@ let unsubscribeRoom = null;
 
 
 /* =====================================================
-   PAGE CONTROL
+   PAGE NAVIGATION
 ===================================================== */
 
 function showPage(id) {
@@ -125,14 +129,15 @@ function showError(id, message) {
 
 
 /* =====================================================
-   FIREBASE ERROR
+   FIREBASE ERROR MESSAGE
 ===================================================== */
 
 function getFirebaseError(error) {
 
-    const code = error?.code || "";
+    const code =
+        error?.code || "";
 
-    const messages = {
+    const errors = {
 
         "auth/invalid-phone-number":
             "Invalid phone number.",
@@ -144,29 +149,31 @@ function getFirebaseError(error) {
             "Invalid OTP.",
 
         "auth/code-expired":
-            "OTP expired. Please request a new OTP.",
+            "OTP expired. Request a new OTP.",
 
         "auth/quota-exceeded":
             "SMS quota exceeded. Please try again later.",
 
         "auth/network-request-failed":
-            "Network error. Check your internet connection.",
+            "Network error. Check your internet.",
 
         "auth/operation-not-allowed":
-            "Phone authentication is not enabled in Firebase.",
+            "Phone authentication is not enabled.",
 
         "auth/captcha-check-failed":
             "reCAPTCHA verification failed."
+
     };
 
-    return messages[code] ||
+    return errors[code] ||
         error?.message ||
         "Something went wrong.";
+
 }
 
 
 /* =====================================================
-   PHONE VALIDATION
+   PHONE
 ===================================================== */
 
 function validPhone(phone) {
@@ -248,7 +255,7 @@ async function setupRegisterRecaptcha() {
 
 
 /* =====================================================
-   REGISTER OTP
+   REGISTER — SEND OTP
 ===================================================== */
 
 async function sendRegisterOTP() {
@@ -308,7 +315,7 @@ async function sendRegisterOTP() {
 
             showError(
                 "registerError",
-                "This number is already registered. Please sign in."
+                "This number is already registered. Please login."
             );
 
             return;
@@ -348,7 +355,7 @@ async function sendRegisterOTP() {
 
 
 /* =====================================================
-   VERIFY REGISTER OTP
+   REGISTER — VERIFY OTP
 ===================================================== */
 
 async function verifyRegisterOTP() {
@@ -449,7 +456,7 @@ async function verifyRegisterOTP() {
 
 
 /* =====================================================
-   LOGIN OTP
+   LOGIN — SEND OTP
 ===================================================== */
 
 async function sendLoginOTP() {
@@ -533,7 +540,7 @@ async function sendLoginOTP() {
 
 
 /* =====================================================
-   VERIFY LOGIN OTP
+   LOGIN — VERIFY OTP
 ===================================================== */
 
 async function verifyLoginOTP() {
@@ -645,7 +652,7 @@ function showHome() {
 
 
 /* =====================================================
-   ROOM CODE
+   GENERATE ROOM CODE
 ===================================================== */
 
 function generateCode() {
@@ -722,6 +729,9 @@ async function createRoom() {
 
         }
 
+
+        /* Check teacher code */
+
         let roomDoc =
             await getDoc(
                 doc(
@@ -730,6 +740,7 @@ async function createRoom() {
                     teacherCode
                 )
             );
+
 
         while (roomDoc.exists()) {
 
@@ -747,9 +758,60 @@ async function createRoom() {
 
         }
 
+
+        /* Check student code */
+
+        let studentQuery =
+            query(
+                collection(
+                    db,
+                    "rooms"
+                ),
+                where(
+                    "studentCode",
+                    "==",
+                    studentCode
+                )
+            );
+
+        let studentResult =
+            await getDocs(
+                studentQuery
+            );
+
+
+        while (!studentResult.empty) {
+
+            studentCode =
+                generateCode();
+
+            studentQuery =
+                query(
+                    collection(
+                        db,
+                        "rooms"
+                    ),
+                    where(
+                        "studentCode",
+                        "==",
+                        studentCode
+                    )
+                );
+
+            studentResult =
+                await getDocs(
+                    studentQuery
+                );
+
+        }
+
+
+        /* Room */
+
         const room = {
 
-            name: roomName,
+            name:
+                roomName,
 
             hostUid:
                 currentUser.uid,
@@ -766,6 +828,7 @@ async function createRoom() {
             members: [
 
                 {
+
                     uid:
                         currentUser.uid,
 
@@ -774,6 +837,7 @@ async function createRoom() {
 
                     role:
                         "host"
+
                 }
 
             ],
@@ -787,6 +851,7 @@ async function createRoom() {
 
         };
 
+
         await setDoc(
             doc(
                 db,
@@ -796,50 +861,39 @@ async function createRoom() {
             room
         );
 
+
         currentRoomCode =
             teacherCode;
 
         isHost = true;
 
-        const createdName =
-            document.getElementById(
+
+        document
+            .getElementById(
                 "createdRoomName"
-            );
+            )
+            .textContent =
+            roomName;
 
-        if (createdName) {
-
-            createdName.textContent =
-                roomName;
-
-        }
-
-        const teacher =
-            document.getElementById(
+        document
+            .getElementById(
                 "teacherCode"
-            );
+            )
+            .textContent =
+            teacherCode;
 
-        if (teacher) {
-
-            teacher.textContent =
-                teacherCode;
-
-        }
-
-        const student =
-            document.getElementById(
+        document
+            .getElementById(
                 "studentCode"
-            );
+            )
+            .textContent =
+            studentCode;
 
-        if (student) {
-
-            student.textContent =
-                studentCode;
-
-        }
 
         showPage(
             "roomCreatedPage"
         );
+
 
     } catch (error) {
 
@@ -921,68 +975,124 @@ async function joinRoom() {
         return;
     }
 
+
     try {
 
-        let roomCode = code;
+        let roomDoc = null;
 
-        let roomDoc =
+        let actualRoomCode = null;
+
+
+        /* =============================================
+           FIRST: CHECK TEACHER CODE
+        ============================================= */
+
+        const directDoc =
             await getDoc(
                 doc(
                     db,
                     "rooms",
-                    roomCode
+                    code
                 )
             );
 
-        /*
-           If student enters student code,
-           find the room by searching room documents.
-        */
 
-        if (!roomDoc.exists()) {
+        if (directDoc.exists()) {
 
-            showError(
-                "joinError",
-                "Room not found."
-            );
+            const room =
+                directDoc.data();
 
-            return;
+            if (
+                room.teacherCode ===
+                code
+            ) {
+
+                roomDoc =
+                    directDoc;
+
+                actualRoomCode =
+                    code;
+
+                isHost =
+                    room.hostUid ===
+                    currentUser.uid;
+
+            }
+
         }
+
+
+        /* =============================================
+           SECOND: CHECK STUDENT CODE
+        ============================================= */
+
+        if (!roomDoc) {
+
+            const studentQuery =
+                query(
+                    collection(
+                        db,
+                        "rooms"
+                    ),
+                    where(
+                        "studentCode",
+                        "==",
+                        code
+                    )
+                );
+
+            const result =
+                await getDocs(
+                    studentQuery
+                );
+
+
+            if (
+                result.empty
+            ) {
+
+                showError(
+                    "joinError",
+                    "Room not found. Check the code."
+                );
+
+                return;
+            }
+
+
+            const foundDoc =
+                result.docs[0];
+
+            roomDoc =
+                foundDoc;
+
+            actualRoomCode =
+                foundDoc.id;
+
+            isHost = false;
+
+        }
+
+
+        /* =============================================
+           ROOM
+        ============================================= */
 
         const room =
             roomDoc.data();
 
+
         currentRoomCode =
-            roomCode;
+            actualRoomCode;
 
-        if (
-            code ===
-            room.teacherCode
-        ) {
 
-            isHost =
-                room.hostUid ===
-                currentUser.uid;
-
-        } else if (
-            code ===
-            room.studentCode
-        ) {
-
-            isHost = false;
-
-        } else {
-
-            showError(
-                "joinError",
-                "Invalid room code."
-            );
-
-            return;
-        }
+        /* =============================================
+           ADD MEMBER
+        ============================================= */
 
         const members =
             room.members || [];
+
 
         const alreadyMember =
             members.some(
@@ -991,133 +1101,10 @@ async function joinRoom() {
                     currentUser.uid
             );
 
+
         if (!alreadyMember) {
 
             await updateDoc(
                 doc(
                     db,
-                    "rooms",
-                    currentRoomCode
-                ),
-                {
-                    members:
-                        arrayUnion({
-
-                            uid:
-                                currentUser.uid,
-
-                            name:
-                                currentUserData.name,
-
-                            role:
-                                isHost
-                                    ? "host"
-                                    : "student"
-
-                        })
-                }
-            );
-
-        }
-
-        openClassroom(
-            currentRoomCode,
-            isHost
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        showError(
-            "joinError",
-            getFirebaseError(error)
-        );
-
-    }
-
-}
-
-
-/* =====================================================
-   OPEN CLASSROOM
-===================================================== */
-
-function openClassroom(
-    roomCode,
-    host
-) {
-
-    currentRoomCode =
-        roomCode;
-
-    isHost =
-        host;
-
-    showPage(
-        "classroomPage"
-    );
-
-    const teacherArea =
-        document.getElementById(
-            "teacherArea"
-        );
-
-    if (teacherArea) {
-
-        teacherArea.classList.toggle(
-            "hidden",
-            !isHost
-        );
-
-    }
-
-    listenToRoom();
-
-}
-
-
-/* =====================================================
-   REAL-TIME ROOM LISTENER
-===================================================== */
-
-function listenToRoom() {
-
-    if (unsubscribeRoom) {
-
-        unsubscribeRoom();
-
-    }
-
-    if (!currentRoomCode) return;
-
-    const roomRef =
-        doc(
-            db,
-            "rooms",
-            currentRoomCode
-        );
-
-    unsubscribeRoom =
-        onSnapshot(
-            roomRef,
-            snapshot => {
-
-                if (!snapshot.exists()) {
-
-                    alert(
-                        "Room no longer exists."
-                    );
-
-                    currentRoomCode =
-                        null;
-
-                    isHost = false;
-
-                    showHome();
-
-                    return;
-                }
-
-                renderRoom(
-                    
+                  
